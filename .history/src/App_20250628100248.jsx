@@ -1,0 +1,21 @@
+import "./App.css";
+import TodoList from './TodoList';
+import TodoForm from './TodoForm';
+import { useState } from "react";
+
+function App({newTodo}) {
+  const [newTodo, setNewTodo] = useState("New Item")
+
+  return (
+    <div>
+      <h1>My Todos</h1>
+        <TodoForm />
+      <ul>
+        <TodoList />
+      <p>{newTodo}</p>
+      </ul>
+    </div>
+  );
+}
+
+export default App;

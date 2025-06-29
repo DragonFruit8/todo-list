@@ -1,0 +1,21 @@
+
+function TodoListItem({todoItem = [
+    { id: 1, title: "review resources" },
+    { id: 2, title: "take notes" },
+    { id: 3, title: "code out app" },
+  ]}) {
+    // const todoItem = props.todoItem;
+    return (
+        <>
+            {todoItem.map((item) => {
+                return (
+                    <li key={item.id}>
+                        {item.title}
+                    </li>
+                )
+            })}
+        </>
+    );
+};
+
+export default TodoListItem;
