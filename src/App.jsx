@@ -6,7 +6,7 @@ import "./App.css";
 
 function App() {
 // eslint-disable-next-line no-unused-vars
-const [newTodo, setNewTodo] = useState("New Paragraph");
+const [newTodo, setNewTodo] = useState("New Todo");
 
   return (
     <div>

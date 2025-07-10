@@ -1,6 +1,6 @@
 import TodoListItem from './TodoListItem';
 
-function TodoList({todo}) {
+function TodoList(todo) {
   return (
     <ul>
       <TodoListItem todo={todo} />
