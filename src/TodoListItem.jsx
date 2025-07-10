@@ -1,6 +1,4 @@
-
-function TodoListItem({id,title}) {
-  // I see this as a pause before continuation of week-04
+function TodoListItem({ id, title }) {
   return <li key={id}>{title}</li>;
 }
 
