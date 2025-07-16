@@ -1,6 +1,0 @@
-
-function TodoListItem(todo) => {
-    return (
-
-    );
-}
