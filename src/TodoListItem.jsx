@@ -1,8 +1,8 @@
-function TodoListItem({id, title, onCompleteTodo, isCompleted}) {
+function TodoListItem({title, onCompleteTodo, isCompleted}) {
 
   return (
     <li>
-      <form id={id}>
+      <form>
         <input
           type="checkbox"
           checked={isCompleted}

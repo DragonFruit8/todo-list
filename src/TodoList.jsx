@@ -1,25 +1,27 @@
-import { useState } from 'react';
-import TodoListItem from './TodoListItem';
-import './todo.css';
+import TodoListItem from "./TodoListItem";
+import "./todo.css";
 
-function TodoList({todoList}) {
-  const [isCompleted, setIsCompleted ] = useState(false)
-  const filteredTodoList = todoList.filter (todo => todo.isCompleted === false);
-  
+function TodoList({ todoList, onCompleteTodo }) {
+  const filteredTodoList = todoList.filter((todo) => !todo.isCompleted);
+
   return (
     <>
-      {filteredTodoList.length > 0
-        ? todoList.map (item => {
-          return(
-          <ul key={item.id}>
-            <TodoListItem
-              key={item.id}
-              title={item.title}
-              checked={isCompleted}
-              onCompleteTodo={(event) => setIsCompleted(event.target.checked)}
-            />
-            </ul>)})
-        : <p>Add todo above to get started</p>}
+      <ul>
+        {filteredTodoList.length > 0 ? (
+          filteredTodoList.map((item) => {
+            return (
+              <TodoListItem
+                key={item.id}
+                title={item.title}
+                checked={item.isCompleted}
+                onCompleteTodo={() => onCompleteTodo(item.id)}
+              />
+            );
+          })
+        ) : (
+          <p>Add todo above to get started</p>
+        )}
+      </ul>
     </>
   );
 }

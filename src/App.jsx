@@ -22,7 +22,7 @@ function App () {
       }
       return todo;
     });
-    return updatedTodos;
+    setTodoList(updatedTodos);
   }
 
   return (
