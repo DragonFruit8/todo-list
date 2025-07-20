@@ -1,8 +1,11 @@
 function TodoForm() {
+  function handleSubmit(e) {
+    e.preventDefault();
+  }
   return (
     <>
-      <label for="todoTitle">Todo</label>
-      <form htmlFor="todoTitle">
+      <label htmlFor="todoTitle">Todo</label>
+      <form onSubmit={handleSubmit}>
         <input id="todoTitle" />
         <button>Add Todo</button>
       </form>
