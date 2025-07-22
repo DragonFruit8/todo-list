@@ -5,7 +5,6 @@ function TodoForm({onAddTodo}) {
   function handleAddTodo(event){
     event.preventDefault()
     const title = event.target.title.value;
-    // console.log(title)
     onAddTodo(title)
     event.target.title.value = ""; 
     todoTitleInput.current.focus();

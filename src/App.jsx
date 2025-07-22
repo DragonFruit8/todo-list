@@ -13,12 +13,12 @@ function App () {
     };
     setTodoList ([...todoList, newTodo]);
   }
-
   return (
     <div>
       <h1>My Todos</h1>
       <TodoForm onAddTodo={addTodo} />
       <TodoList todoList={todoList} />
+
     </div>
   );
 }
