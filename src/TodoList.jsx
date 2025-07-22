@@ -1,13 +1,10 @@
 import TodoListItem from './TodoListItem';
-import todos from './todolist.json';
+import './todo.css';
 
-function TodoList () {
-  const todo = todos.todo.map (item => {
-    return <TodoListItem key={item.id} title={item.item} />;
-  });
+function TodoList({ todoList }) {
   return (
     <ul>
-      {todo}
+      {todoList.map (todo => <TodoListItem key={todo.id} title={todo.title} />)}
     </ul>
   );
 }
