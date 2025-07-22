@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import TodoList from './TodoList';
-import TodoForm from './TodoForm';
+import {useState} from 'react';
+import TodoList from './features/TodoList/TodoList';
+import TodoForm from './features/TodoForm';
 import './App.css';
 
 function App () {
@@ -22,14 +22,32 @@ function App () {
       }
       return todo;
     });
-    setTodoList(updatedTodos);
+    setTodoList (updatedTodos);
+  }
+
+  function updateTodo (editedTodo) {
+    const updatedTodo = todoList.map (todo => {
+      // Comparing todo.id which is a # AND editedTodo which is from onUpdateTodo(todo.title) in TodoList.jsx
+      // editedTodo variable is a string "" NOT
+      if (todo.id === editedTodo) {
+        console.log(editedTodo)
+        return {...todo, title: todo.title};
+      }
+      return todo;
+    });
+    
+    setTodoList (updatedTodo);
   }
 
   return (
     <div>
       <h1>My Todos</h1>
       <TodoForm onAddTodo={addTodo} />
-      <TodoList todoList={todoList} onCompleteTodo={completeTodo} />
+      <TodoList
+        todoList={todoList}
+        onUpdateTodo={updateTodo}
+        onCompleteTodo={completeTodo}
+      />
     </div>
   );
 }
