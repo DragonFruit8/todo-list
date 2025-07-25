@@ -27,15 +27,16 @@ function App () {
 
   function updateTodo (editedTodo) {
     const updatedTodo = todoList.map (todo => {
-      // Comparing todo.id which is a # AND editedTodo which is from onUpdateTodo(todo.title) in TodoList.jsx
-      // editedTodo variable is a string "" NOT
-      if (todo.id === editedTodo) {
-        console.log(editedTodo)
-        return {...todo, title: todo.title};
+      if (todo.title !== editedTodo) {
+        return {
+          id: todo.id,
+          title: editedTodo,
+          isCompleted: todo.isCompleted,
+        };
       }
-      return todo;
+      return editedTodo;
     });
-    
+
     setTodoList (updatedTodo);
   }
 
