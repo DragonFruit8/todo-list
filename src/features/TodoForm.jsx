@@ -19,14 +19,15 @@ function TodoForm({ onAddTodo }) {
   }
   return (
     <>
-      <label htmlFor="todoTitle">Todo</label>
-      <form onSubmit={handleAddTodo}>
+      <label htmlFor="todoTitle" className="p-2 ps-3 fs-5">Todo</label>
+      <form onSubmit={handleAddTodo} className="p-2">
         <input
           id="todoTitle"
           name="title"
           ref={todoTitleInput}
           value={workingTodoTitle}
           onChange={(event) => setworkingTodoTitle(event.target.value)}
+          className={isDisabled ? 'p-1' : 'p-2'}
         />
         <button disabled={isDisabled}>Add Todo</button>
       </form>

@@ -41,7 +41,7 @@ function App () {
   }
 
   return (
-    <div>
+    <div className='w-75 p-3'>
       <h1>My Todos</h1>
       <TodoForm onAddTodo={addTodo} />
       <TodoList
