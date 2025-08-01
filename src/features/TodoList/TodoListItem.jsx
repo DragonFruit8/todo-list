@@ -5,7 +5,7 @@ function TodoListItem({
   id,
   title,
   onCompleteTodo,
-  isCompleted,
+  isComplete,
   onUpdateTodo,
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -48,7 +48,7 @@ function TodoListItem({
               <input
                 type="checkbox"
                 id={`checkbox${id}`}
-                checked={isCompleted}
+                checked={isComplete}
                 onChange={() => onCompleteTodo(id)}
               />
             </label>

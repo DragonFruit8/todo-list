@@ -8,7 +8,7 @@ function App() {
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${
     import.meta.env.VITE_TABLE_NAME
   }`;
-  const token = import.meta.env.VITE_PAT
+  const token = import.meta.env.VITE_PAT;
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -16,7 +16,7 @@ function App() {
     const newTodo = {
       id: Date.now(),
       title,
-      isCompleted: false,
+      isComplete: false,
     };
     setTodoList([...todoList, newTodo]);
   }
@@ -24,7 +24,7 @@ function App() {
   function completeTodo(id) {
     const updatedTodos = todoList.map((todo) => {
       if (todo.id === id) {
-        return { ...todo, isCompleted: true };
+        return { ...todo, isComplete: true };
       }
       return todo;
     });
@@ -37,7 +37,7 @@ function App() {
         return {
           id: todo.id,
           title: editedTodo,
-          isCompleted: todo.isCompleted,
+          isComplete: todo.isComplete,
         };
       }
       return editedTodo;
@@ -50,8 +50,9 @@ function App() {
     const options = {
       method: "GET",
       body: JSON.stringify(),
-      headers: {  
-        Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     };
     const fetchTodos = async () => {
       try {
@@ -61,15 +62,20 @@ function App() {
           setErrorMessage("Error: " + resp.status);
           throw new Error(resp.status);
         }
-        const data = await resp.json();
-        if (data.status != "success") {
-          setErrorMessage("Status: " + resp.status);
+        const { records } = await resp.json();
+        if (records.status != "success") {
+          setErrorMessage(resp.status);
+          
         }
-        setTodoList({
-          id: data.records.id,
-          title: data.records.title,
-          isCompleted: data.records.isCompleted
-        })
+        setTodoList(
+          records.map((record) => {
+            const fetchedTodoList = {
+              id: record.id,
+              ...record.fields,
+            };
+            return fetchedTodoList;
+          })
+        );
       } catch (error) {
         console.error(error.message);
       } finally {
@@ -83,16 +89,13 @@ function App() {
     <div>
       <h1>My Todos</h1>
       <TodoForm onAddTodo={addTodo} />
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <TodoList
-          todoList={todoList}
-          onUpdateTodo={updateTodo}
-          onCompleteTodo={completeTodo}
-        />
-      )}
-      {errorMessage}
+      <TodoList
+        todoList={todoList}
+        isLoading={isLoading}
+        onUpdateTodo={updateTodo}
+        onCompleteTodo={completeTodo}
+      />
+      {errorMessage ? (<hr /> ): (<p>{errorMessage}</p>)}
     </div>
   );
 }

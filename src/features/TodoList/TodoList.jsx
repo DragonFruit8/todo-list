@@ -1,24 +1,19 @@
 import TodoListItem from './TodoListItem';
 import '../../todo.css';
 
-function TodoList({todoList, onCompleteTodo, onUpdateTodo}) {
-  const filteredTodoList = todoList.filter (todo => !todo.isCompleted);
-
+function TodoList({todoList, onCompleteTodo, onUpdateTodo, isLoading}) {
   return (
     <ul>
-      {filteredTodoList.length > 0
-        ? filteredTodoList.map (item => {
-            return (
-              <TodoListItem
-                key={item.id}
-                title={item.title}
-                checked={item.isCompleted}
-                onUpdateTodo={onUpdateTodo}
-                onCompleteTodo={() => onCompleteTodo (item.id)}
-              />
-            );
-          })
-        : <p>Add todo above to get started</p>}
+      {isLoading ? <p>Todo list is loading... </p>
+        : todoList.map (item => (
+            <TodoListItem
+              key={item.id}
+              title={item.title}
+              checked={item.isComplete}
+              onUpdateTodo={onUpdateTodo}
+              onCompleteTodo={() => onCompleteTodo (item.id)}
+            />
+          ))}
     </ul>
   );
 }
