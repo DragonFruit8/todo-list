@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-function TodoForm({ onAddTodo }) {
+function TodoForm({ onAddTodo, text }) {
   const todoTitleInput = useRef(document.querySelector("#todoTitle"));
   const [workingTodoTitle, setworkingTodoTitle] = useState("");
   const isDisabled = workingTodoTitle.trim() === "";
@@ -12,7 +12,8 @@ function TodoForm({ onAddTodo }) {
       alert("Please enter TODO Item");
     } else {
       // 2nd Input Submit Defense (Takes spaces out IF entered character after " " ...)
-      onAddTodo(workingTodoTitle.trim());
+      const newTodo = workingTodoTitle.trim();
+      onAddTodo(newTodo);
     }
     setworkingTodoTitle("");
     todoTitleInput.current.focus();
@@ -28,7 +29,7 @@ function TodoForm({ onAddTodo }) {
           value={workingTodoTitle}
           onChange={(event) => setworkingTodoTitle(event.target.value)}
         />
-        <button disabled={isDisabled}>Add Todo</button>
+        {<button disabled={isDisabled}>{text}</button>}
       </form>
     </>
   );
