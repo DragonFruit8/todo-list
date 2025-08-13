@@ -1,8 +1,8 @@
 import TodoListItem from './TodoListItem';
-import '../../todo.css';
 
-function TodoList({todoList, onCompleteTodo, onUpdateTodo}) {
-  const filteredTodoList = todoList.filter (todo => !todo.isCompleted);
+
+function TodoList({todoList, onUpdateTodo, onCompleteTodo}) {
+  const filteredTodoList = todoList.filter (todo => !todo.isComplete);
 
   return (
     <ul>
@@ -12,8 +12,8 @@ function TodoList({todoList, onCompleteTodo, onUpdateTodo}) {
               <TodoListItem
                 key={item.id}
                 title={item.title}
-                checked={item.isCompleted}
-                onUpdateTodo={onUpdateTodo}
+                checked={item.isComplete}
+                onUpdateTodo={(title) => onUpdateTodo(item.id, title)}
                 onCompleteTodo={() => onCompleteTodo (item.id)}
               />
             );

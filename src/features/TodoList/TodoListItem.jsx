@@ -5,22 +5,22 @@ function TodoListItem({
   id,
   title,
   onCompleteTodo,
-  isCompleted,
+  isComplete,
   onUpdateTodo,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [workingTitle, setWorkingTitle] = useState(title);
-
   const handleCancel = () => {
     setWorkingTitle(title);
     setIsEditing(false);
   };
 
   const handleEdit = (event) => {
+    // console.log(event.target.value)
     setWorkingTitle(event.target.value);
   };
 
-  function handleUpdate(event) {
+  const handleUpdate = (event) => {
     if (!isEditing) {
       return;
     }
@@ -34,7 +34,7 @@ function TodoListItem({
       <form onSubmit={handleUpdate}>
         {isEditing ? (
           <>
-            <TextInputWithLabel onChange={handleEdit} value={workingTitle} />
+            <TextInputWithLabel value={workingTitle} onChange={handleEdit}  />
             <button type="button" onClick={handleCancel}>
               Cancel
             </button>
@@ -48,7 +48,7 @@ function TodoListItem({
               <input
                 type="checkbox"
                 id={`checkbox${id}`}
-                checked={isCompleted}
+                checked={isComplete}
                 onChange={() => onCompleteTodo(id)}
               />
             </label>
