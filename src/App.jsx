@@ -14,7 +14,7 @@ function App () {
     };
     setTodoList ([...todoList, newTodo]);
   }
-
+  
   function completeTodo (id) {
     const updatedTodos = todoList.map (todo => {
       if (todo.id === id) {
@@ -35,7 +35,7 @@ function App () {
     });
     setTodoList ([...updatedTodo]);
   }
-
+  
   return (
     <div>
       <h1>My Todos</h1>
