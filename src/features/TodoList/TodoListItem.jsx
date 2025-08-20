@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TextInputWithLabel from "../../shared/TextInputWithLabel";
 
 function TodoListItem({
@@ -10,10 +10,11 @@ function TodoListItem({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [workingTitle, setWorkingTitle] = useState(title);
-  const handleCancel = () => {
+ 
+    const handleCancel = useEffect(() => {
     setWorkingTitle(title);
     setIsEditing(false);
-  };
+  }, [title]);
 
   const handleEdit = (event) => {
     // console.log(event.target.value)
