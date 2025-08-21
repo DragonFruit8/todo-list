@@ -1,17 +1,18 @@
 import TodoListItem from './TodoListItem';
-import '../../todo.css';
 
-function TodoList({todoList, onCompleteTodo, onUpdateTodo, isLoading}) {
+function TodoList({todoList, onCompleteTodo, onUpdateTodo, isLoading }) {
+  
   return (
     <ul>
       {isLoading ? <p>Todo list is loading... </p>
-        : todoList.map (item => (
+        : todoList
+        .map ((item) => (
             <TodoListItem
               key={item.id}
               title={item.title}
               checked={item.isComplete}
-              onUpdateTodo={onUpdateTodo}
-              onCompleteTodo={() => onCompleteTodo (item.id)}
+              onUpdateTodo={(title) => onUpdateTodo(item.id, title)}
+              onCompleteTodo={(event) => onCompleteTodo(item.id, event)}
             />
           ))}
     </ul>
