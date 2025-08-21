@@ -1,6 +1,6 @@
 import TodoListItem from './TodoListItem';
 
-function TodoList({todoList, onCompleteTodo, onUpdateTodo, isLoading }) {
+function TodoList({ isLoading, todoList, onUpdateTodo, onCompleteTodo }) {
   
   return (
     <ul>
@@ -10,8 +10,9 @@ function TodoList({todoList, onCompleteTodo, onUpdateTodo, isLoading }) {
           return (
             <TodoListItem
               key={item.id}
+              id={`checkbox${item.id}`}
               title={item.title}
-              checked={item.isComplete}
+              checked={item.isComplete ? 'checked' : '' }
               onUpdateTodo={(title) => onUpdateTodo(item.id, title)}
               onCompleteTodo={(event) => onCompleteTodo(item.id, event)}
             />

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import TextInputWithLabel from "../../shared/TextInputWithLabel";
 
-function TodoListItem({ id, title, onCompleteTodo, isComplete, onUpdateTodo }) {
+function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
   const [isEditing, setIsEditing] = useState(false);
   const [workingTitle, setWorkingTitle] = useState(title);
   
@@ -47,8 +47,8 @@ function TodoListItem({ id, title, onCompleteTodo, isComplete, onUpdateTodo }) {
             <label>
               <input
                 type="checkbox"
-                id={`checkbox${id}`}
-                checked={isComplete}
+                id={id}
+                checked={checked}
                 onChange={onCompleteTodo}
               />
             </label>

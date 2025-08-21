@@ -1,18 +1,19 @@
-import {useState, useEffect} from 'react';
-import TodoList from './features/TodoList/TodoList';
-import TodoForm from './features/TodoForm';
-import './App.css';
+import { useState, useEffect } from "react";
+import TodoList from "./features/TodoList/TodoList";
+import TodoForm from "./features/TodoForm";
+import "./App.css";
 
-function App () {
-  const [todoList, setTodoList] = useState ([]);
-    const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
-    const token = import.meta.env.VITE_PAT;
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const [isSaving, setIsSaving] = useState(false);
+function App() {
+  const [todoList, setTodoList] = useState([]);
+  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${
+    import.meta.env.VITE_TABLE_NAME
+  }`;
+  const token = import.meta.env.VITE_PAT;
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
-
-      useEffect(() => {
+  useEffect(() => {
     const options = {
       method: "GET",
       body: JSON.stringify(),
@@ -34,16 +35,13 @@ function App () {
             const data = {
               id: record.id,
               title: record.fields.title,
-              isComplete: record.fields?.isComplete
+              isComplete: record.fields?.isComplete,
             };
-            // const check = todoList.find(todo => todo.id === data.id);
-            // const completeTodo = todoList.find(todo => todo.id === data.id)
-            // if()
             if (data.status != "success") {
               console.log("Status: " + resp.status);
             }
-            if(data.isComplete === undefined) {
-              data.isComplete = false
+            if (data.isComplete === undefined) {
+              data.isComplete = false;
             }
             return data;
           })
@@ -58,9 +56,8 @@ function App () {
     fetchTodos();
   }, [url, token]);
 
-
-   const addTodo = async (newTodo) => {
-        const payload = {
+  const addTodo = async (newTodo) => {
+    const payload = {
       records: [
         {
           fields: {
@@ -78,7 +75,7 @@ function App () {
       },
       body: JSON.stringify(payload),
     };
-     try {
+    try {
       setIsSaving(true);
       const resp = await fetch(url, options);
       if (!resp.ok) {
@@ -98,63 +95,22 @@ function App () {
     } finally {
       setIsSaving(false);
     }
-  }
+  };
 
-const completeTodo = async (id, event) => {
+  const completeTodo = async (id, event) => {
     const todoId = todoList.find((todo) => todo.id === id);
     const todoIsComplete = todoList.map((todo) => {
-      if(todo.id === id) {
-        todoId.isComplete = event.target.checked
+      if (todo.id === id) {
+        todoId.isComplete = event.target.checked;
       }
       return todo;
-    })
+    });
     const payload = {
       records: [
         {
           id: todoId.id,
-          fields : {
-            isComplete: todoIsComplete.isComplete,
-          },
-        },
-      ],
-    };
-    const options = {
-      method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    };
-    try {
-      setIsSaving(true);
-      const resp = await fetch(url, options);
-      if (!resp.ok) {
-        throw new Error("Data failed to be post");
-      }
-      const { records } = await resp.json();
-      if(records) {
-        console.log(records)
-      }
-      setTodoList([...todoIsComplete])
-    } catch (error) {
-      setErrorMessage(error.message);
-      setTodoList([...todoIsComplete])
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const updateTodo = async (id, editedTodo) => {
-    const originalTodo = todoList.find((todo) => todo.id === id);
-    originalTodo.title = editedTodo;
-    const payload = {
-      records: [
-        {
-          id: originalTodo.id,
           fields: {
-            title: editedTodo,
-            isComplete: originalTodo.isComplete
+            isComplete: todoId.isComplete,
           },
         },
       ],
@@ -167,7 +123,6 @@ const completeTodo = async (id, event) => {
       },
       body: JSON.stringify(payload),
     };
-    
     try {
       setIsSaving(true);
       const resp = await fetch(url, options);
@@ -175,8 +130,55 @@ const completeTodo = async (id, event) => {
         throw new Error("Data failed to be post");
       }
       const { records } = await resp.json();
-      if(records) {
-        console.log("Data Updated successfully")
+      if (records) {
+        console.log("Data Updated!");
+      }
+      setTodoList([...todoIsComplete]);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setTodoList([...todoIsComplete]);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const updateTodo = async (id, editedTodo) => {
+    const originalTodo = todoList.find((todo) => todo.id === id);
+    if (originalTodo.title == editedTodo) {
+      return;
+    } else {
+      originalTodo.isComplete = false;
+      originalTodo.title = editedTodo;
+    }
+    const payload = {
+      records: [
+        {
+          id: originalTodo.id,
+          fields: {
+            title: editedTodo,
+            isComplete: originalTodo.isComplete,
+          },
+        },
+      ],
+    };
+    const options = {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    };
+
+    try {
+      setIsSaving(true);
+      const resp = await fetch(url, options);
+      if (!resp.ok) {
+        throw new Error("Data failed to be post");
+      }
+      const { records } = await resp.json();
+      if (records) {
+        console.log("Data Updated successfully");
       }
     } catch (error) {
       console.error(error.message);
@@ -192,7 +194,7 @@ const completeTodo = async (id, event) => {
   };
 
   return (
-     <div>
+    <div>
       <h1>My Todos</h1>
       <TodoForm
         onAddTodo={addTodo}
