@@ -6,7 +6,14 @@ function TodoListItem({ id, title, onCompleteTodo, isComplete, onUpdateTodo }) {
   const [workingTitle, setWorkingTitle] = useState(title);
 
 
-  const handleCancel = useEffect(() => {
+
+
+  const handleCancel = () => {
+    setWorkingTitle(title)
+    setIsEditing(false);
+  }
+  
+  useEffect(() => {
     setWorkingTitle(title),
     setIsEditing(false) 
     },[title]);
