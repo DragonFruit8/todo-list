@@ -15,6 +15,7 @@ function TodoForm({ onAddTodo }) {
     } else {
       // 2nd Input Submit Defense (Takes spaces out IF entered character after " " ...)
       onAddTodo(workingTodoTitle.trim());
+      
     }
     setWorkingTodoTitle("");
     todoTitleInput.current.focus();
