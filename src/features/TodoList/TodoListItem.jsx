@@ -4,7 +4,7 @@ import TextInputWithLabel from "../../shared/TextInputWithLabel";
 function TodoListItem({ id, title, onCompleteTodo, isComplete, onUpdateTodo }) {
   const [isEditing, setIsEditing] = useState(false);
   const [workingTitle, setWorkingTitle] = useState(title);
-
+  
   const handleCancel = () => {
     setWorkingTitle(title);
     setIsEditing(false)

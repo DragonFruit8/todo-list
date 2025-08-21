@@ -6,7 +6,8 @@ function TodoList({todoList, onCompleteTodo, onUpdateTodo, isLoading }) {
     <ul>
       {isLoading ? <p>Todo list is loading... </p>
         : todoList
-        .map ((item) => (
+        .map ((item) => {
+          return (
             <TodoListItem
               key={item.id}
               title={item.title}
@@ -14,7 +15,7 @@ function TodoList({todoList, onCompleteTodo, onUpdateTodo, isLoading }) {
               onUpdateTodo={(title) => onUpdateTodo(item.id, title)}
               onCompleteTodo={(event) => onCompleteTodo(item.id, event)}
             />
-          ))}
+        )})}
     </ul>
   );
 }

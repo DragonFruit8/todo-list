@@ -36,15 +36,19 @@ function App () {
               title: record.fields.title,
               isComplete: record.fields?.isComplete
             };
+            // const check = todoList.find(todo => todo.id === data.id);
+            // const completeTodo = todoList.find(todo => todo.id === data.id)
+            // if()
             if (data.status != "success") {
               console.log("Status: " + resp.status);
             }
-            if(data.isComplete === null || data.isComplete === undefined) {
+            if(data.isComplete === undefined) {
               data.isComplete = false
             }
             return data;
           })
         );
+        // NEED TO VERIFY AND MAKE SURE isComplete (event) is checked
       } catch (error) {
         setErrorMessage(error.message);
       } finally {
@@ -117,7 +121,7 @@ const completeTodo = async (id, event) => {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
