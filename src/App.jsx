@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
-import "./App.css";
+
 
 function App() {
   const [todoList, setTodoList] = useState([]);
@@ -89,6 +89,12 @@ function App() {
       if (!records[0].fields.isComplete) {
         savedTodo.isComplete = false;
       }
+      console.log(
+        `"${savedTodo.title}" Saved in Database\n${
+          savedTodo.isComplete ?  "And IS CHECKED" : ""
+        }`
+      );
+
       setTodoList([...todoList, savedTodo]);
     } catch (error) {
       setErrorMessage(error.message);
@@ -130,8 +136,10 @@ function App() {
         throw new Error("Data failed to be post");
       }
       const { records } = await resp.json();
-      if (records) {
-        console.log("Data Updated!");
+      if (records[0].fields.isComplete) {
+        console.log(`${records[0].fields.title} is CHECKED in the Database`);
+      } else if (!records[0].fields.isComplete) {
+        console.log(`${records[0].fields.title} is UNCHECKED in the Database`);
       }
       setTodoList([...todoIsComplete]);
     } catch (error) {
@@ -177,8 +185,10 @@ function App() {
         throw new Error("Data failed to be post");
       }
       const { records } = await resp.json();
-      if (records) {
-        console.log("Data Updated successfully");
+      if (records[0].fields.title) {
+        console.log(
+          `Item ID: ${records[0].id} \n Title Changed to: ${records[0].fields.title}`
+        );
       }
     } catch (error) {
       console.error(error.message);
@@ -194,18 +204,19 @@ function App() {
   };
 
   return (
-    <div>
+    <>
       <h1>My Todos</h1>
       <TodoForm
         onAddTodo={addTodo}
         text={isSaving ? "Saving..." : "Add Todo"}
       />
-      <TodoList
+      {todoList <= 0 ? <p>Add Todo Item...</p> :
+        <TodoList
         todoList={todoList}
         isLoading={isLoading}
         onUpdateTodo={updateTodo}
         onCompleteTodo={completeTodo}
-      />
+      />}
       {errorMessage !== "" ? (
         <div>
           <hr />
@@ -217,7 +228,7 @@ function App() {
       ) : (
         <hr />
       )}
-    </div>
+    </>
   );
 }
 
