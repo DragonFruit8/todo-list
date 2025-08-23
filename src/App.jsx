@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
+import TodosViewForm from "./features/TodosViewForm";
 
 
 function App() {
@@ -12,6 +13,19 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [sortField, setSortField] = useState("createdTime");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [queryString , setQueryString] = useState("")
+
+  
+  const encodeUrl = ({sortDirection, sortField, queryString}) => {
+      let searchQuery = "";
+      let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+      if(queryString) {
+        searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
+      }
+      return encodeURI(`${url}?${sortQuery}${searchQuery}`);
+  };
 
   useEffect(() => {
     const options = {
@@ -24,7 +38,7 @@ function App() {
     const fetchTodos = async () => {
       try {
         setIsLoading(true);
-        const resp = await fetch(url, options);
+        const resp = await fetch(encodeUrl({ sortDirection, sortField, queryString }), options);
         if (!resp.ok) {
           setErrorMessage("Error: " + resp.status);
           throw new Error(resp.status);
@@ -33,6 +47,7 @@ function App() {
         setTodoList(
           records.map((record) => {
             const data = {
+              createdTime: record.createdTime,
               id: record.id,
               title: record.fields.title,
               isComplete: record.fields?.isComplete,
@@ -46,7 +61,6 @@ function App() {
             return data;
           })
         );
-        // NEED TO VERIFY AND MAKE SURE isComplete (event) is checked
       } catch (error) {
         setErrorMessage(error.message);
       } finally {
@@ -54,7 +68,7 @@ function App() {
       }
     };
     fetchTodos();
-  }, [url, token]);
+  }, [queryString, sortDirection, sortField, token]);
 
   const addTodo = async (newTodo) => {
     const payload = {
@@ -77,7 +91,7 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(url, options);
+      const resp = await fetch(encodeUrl({ sortDirection, sortField, queryString }), options);
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -131,7 +145,7 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(url, options);
+      const resp = await fetch(encodeUrl({ sortDirection, sortField, queryString }), options);
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -180,7 +194,7 @@ function App() {
 
     try {
       setIsSaving(true);
-      const resp = await fetch(url, options);
+      const resp = await fetch(encodeUrl({ sortDirection, sortField, queryString }), options);
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -228,8 +242,22 @@ function App() {
       ) : (
         <hr />
       )}
+      <TodosViewForm 
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
+        sortField={sortField}
+        setSortField={setSortField}
+        queryString={queryString}
+        setQueryString={setQueryString}
+      />
     </>
   );
 }
 
 export default App;
+// sortDirection, 
+// setSortDirection, 
+// sortField, 
+// setSortField,
+// queryString,
+// setQueryString
