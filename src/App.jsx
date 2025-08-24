@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
-
 
 function App() {
   const [todoList, setTodoList] = useState([]);
@@ -15,17 +14,19 @@ function App() {
   const [isSaving, setIsSaving] = useState(false);
   const [sortField, setSortField] = useState("createdTime");
   const [sortDirection, setSortDirection] = useState("desc");
-  const [queryString , setQueryString] = useState("")
+  const [queryString, setQueryString] = useState("");
 
-  
-  const encodeUrl = ({sortDirection, sortField, queryString}) => {
+  const encodeUrl = useCallback(
+    ({ sortDirection, sortField, queryString }) => {
       let searchQuery = "";
       let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-      if(queryString) {
+      if (queryString) {
         searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
       }
       return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-  };
+    },
+    [url]
+  );
 
   useEffect(() => {
     const options = {
@@ -38,7 +39,10 @@ function App() {
     const fetchTodos = async () => {
       try {
         setIsLoading(true);
-        const resp = await fetch(encodeUrl({ sortDirection, sortField, queryString }), options);
+        const resp = await fetch(
+          encodeUrl({ queryString, sortDirection, sortField }),
+          options
+        );
         if (!resp.ok) {
           setErrorMessage("Error: " + resp.status);
           throw new Error(resp.status);
@@ -68,7 +72,7 @@ function App() {
       }
     };
     fetchTodos();
-  }, [queryString, sortDirection, sortField, token]);
+  }, [encodeUrl, queryString, sortDirection, sortField, token]);
 
   const addTodo = async (newTodo) => {
     const payload = {
@@ -91,7 +95,10 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(encodeUrl({ sortDirection, sortField, queryString }), options);
+      const resp = await fetch(
+        encodeUrl({ queryString, sortDirection, sortField }),
+        options
+      );
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -105,7 +112,7 @@ function App() {
       }
       console.log(
         `"${savedTodo.title}" Saved in Database\n${
-          savedTodo.isComplete ?  "And IS CHECKED" : ""
+          savedTodo.isComplete ? "And IS CHECKED" : ""
         }`
       );
 
@@ -145,7 +152,10 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(encodeUrl({ sortDirection, sortField, queryString }), options);
+      const resp = await fetch(
+        encodeUrl({ queryString, sortDirection, sortField }),
+        options
+      );
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -194,7 +204,10 @@ function App() {
 
     try {
       setIsSaving(true);
-      const resp = await fetch(encodeUrl({ sortDirection, sortField, queryString }), options);
+      const resp = await fetch(
+        encodeUrl({ queryString, sortDirection, sortField }),
+        options
+      );
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -224,13 +237,16 @@ function App() {
         onAddTodo={addTodo}
         text={isSaving ? "Saving..." : "Add Todo"}
       />
-      {todoList <= 0 ? <p>Add Todo Item...</p> :
+      {todoList <= 0 ? (
+        <p>Add Todo Item...</p>
+      ) : (
         <TodoList
-        todoList={todoList}
-        isLoading={isLoading}
-        onUpdateTodo={updateTodo}
-        onCompleteTodo={completeTodo}
-      />}
+          todoList={todoList}
+          isLoading={isLoading}
+          onUpdateTodo={updateTodo}
+          onCompleteTodo={completeTodo}
+        />
+      )}
       {errorMessage !== "" ? (
         <div>
           <hr />
@@ -242,7 +258,7 @@ function App() {
       ) : (
         <hr />
       )}
-      <TodosViewForm 
+      <TodosViewForm
         sortDirection={sortDirection}
         setSortDirection={setSortDirection}
         sortField={sortField}
@@ -255,9 +271,3 @@ function App() {
 }
 
 export default App;
-// sortDirection, 
-// setSortDirection, 
-// sortField, 
-// setSortField,
-// queryString,
-// setQueryString
