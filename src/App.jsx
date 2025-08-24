@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
@@ -13,8 +13,9 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [sortField, setSortField] = useState("createdTime");
-  const [sortDirection, setSortDirection] = useState("desc");
+  const [sortDirection, setSortDirection] = useState("asc");
   const [queryString, setQueryString] = useState("");
+  const todoMemo = useMemo(() => todoList, [todoList])
 
   const encodeUrl = useCallback(
     ({ sortDirection, sortField, queryString }) => {
@@ -116,7 +117,7 @@ function App() {
         }`
       );
 
-      setTodoList([...todoList, savedTodo]);
+      setTodoList([...todoMemo, savedTodo]);
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -125,8 +126,8 @@ function App() {
   };
 
   const completeTodo = async (id, event) => {
-    const todoId = todoList.find((todo) => todo.id === id);
-    const todoIsComplete = todoList.map((todo) => {
+    const todoId = todoMemo.find((todo) => todo.id === id);
+    const todoIsComplete = todoMemo.map((todo) => {
       if (todo.id === id) {
         todoId.isComplete = event.target.checked;
       }
@@ -175,7 +176,7 @@ function App() {
   };
 
   const updateTodo = async (id, editedTodo) => {
-    const originalTodo = todoList.find((todo) => todo.id === id);
+    const originalTodo = todoMemo.find((todo) => todo.id === id);
     if (originalTodo.title == editedTodo) {
       return;
     } else {
@@ -237,11 +238,11 @@ function App() {
         onAddTodo={addTodo}
         text={isSaving ? "Saving..." : "Add Todo"}
       />
-      {todoList <= 0 ? (
+      {todoMemo <= 0 ? (
         <p>Add Todo Item...</p>
       ) : (
         <TodoList
-          todoList={todoList}
+          todoList={todoMemo}
           isLoading={isLoading}
           onUpdateTodo={updateTodo}
           onCompleteTodo={completeTodo}
