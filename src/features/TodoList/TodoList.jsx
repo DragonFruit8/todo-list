@@ -1,4 +1,6 @@
 import TodoListItem from './TodoListItem';
+import styled from 'styled-components';
+import './TodoList.module.css'
 
 function TodoList({ isLoading, todoList, onUpdateTodo, onCompleteTodo }) {
   
@@ -13,6 +15,7 @@ function TodoList({ isLoading, todoList, onUpdateTodo, onCompleteTodo }) {
               id={`checkbox${item.id}`}
               title={item.title}
               checked={item.isComplete ? 'checked' : '' }
+              className={styled.checkedItem}
               onUpdateTodo={(title) => onUpdateTodo(item.id, title)}
               onCompleteTodo={(event) => onCompleteTodo(item.id, event)}
             />
@@ -20,4 +23,5 @@ function TodoList({ isLoading, todoList, onUpdateTodo, onCompleteTodo }) {
     </ul>
   );
 }
+
 export default TodoList;

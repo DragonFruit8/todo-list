@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
-
+import "./App.module.css";
+import styled from "styled-components";
+import TodoLogo from "./assets/favicon.ico";
 function App() {
   const [todoList, setTodoList] = useState([]);
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${
@@ -15,7 +17,7 @@ function App() {
   const [sortField, setSortField] = useState("createdTime");
   const [sortDirection, setSortDirection] = useState("asc");
   const [queryString, setQueryString] = useState("");
-  const todoMemo = useMemo(() => todoList, [todoList])
+  const todoMemo = useMemo(() => todoList, [todoList]);
 
   const encodeUrl = useCallback(
     ({ sortDirection, sortField, queryString }) => {
@@ -232,11 +234,16 @@ function App() {
   };
 
   return (
-    <>
-      <h1>My Todos</h1>
+    <Main>
+      <h1>
+        <span>
+          <img src={TodoLogo} alt="Terra'Novare logo" />
+        </span>
+        My Todos
+      </h1>
       <TodoForm
         onAddTodo={addTodo}
-        text={isSaving ? "Saving..." : "Add Todo"}
+        text={isSaving ? "Saving..." : <span>Add Todo</span>}
       />
       {todoMemo <= 0 ? (
         <p>Add Todo Item...</p>
@@ -267,8 +274,24 @@ function App() {
         queryString={queryString}
         setQueryString={setQueryString}
       />
-    </>
+    </Main>
   );
 }
-
+const Main = styled.main`
+  margin: 4rem auto auto auto;
+  max-width: 600px;
+  justify-content: center;
+  padding: 0 0.7rem;
+  h1 {
+    display: flex;
+    gap: 0.2rem;
+    span {
+      img {
+        border-radius: 15px;
+        width: 25px;
+        height: 25px;
+      }
+    }
+  }
+`;
 export default App;
