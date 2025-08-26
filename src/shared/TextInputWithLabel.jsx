@@ -1,4 +1,4 @@
-
+import styled from 'styled-components';
 function TextInputWithLabel({
     elementId,
     label,
@@ -8,16 +8,21 @@ function TextInputWithLabel({
 }) {
   return (
     <>
-        <label htmlFor={elementId}>{label}</label>
-        <input  
+        <label htmlFor={elementId}>{label}
+        <StyledInput  
             id={elementId}
             type='text'
             ref={ref}
             value={value}
             onChange={onChange}                
             />
+        </label>
     </>
   )
 }
+
+const StyledInput = styled.input`
+color: darkgreen;
+`;
 
 export default TextInputWithLabel

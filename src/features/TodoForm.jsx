@@ -64,7 +64,7 @@ const StyledForm = styled.form`
   button:disabled:hover,
   button:disabled:hover span {
     background-color: #710000ff;
-    color: black;
+    color: yellow;
     transition: 3s all ease-in-out;
   }
   button:hover:has(span) {

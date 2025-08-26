@@ -5,6 +5,7 @@ import TodosViewForm from "./features/TodosViewForm";
 import "./App.module.css";
 import styled from "styled-components";
 import TodoLogo from "./assets/favicon.ico";
+
 function App() {
   const [todoList, setTodoList] = useState([]);
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${
@@ -47,7 +48,6 @@ function App() {
           options
         );
         if (!resp.ok) {
-          setErrorMessage("Error: " + resp.status);
           throw new Error(resp.status);
         }
         const { records } = await resp.json();
@@ -69,6 +69,9 @@ function App() {
           })
         );
       } catch (error) {
+        if (error.status === 401) {
+          setErrorMessage("‼️" + "Authorization Required" + "‼️")
+        }
         setErrorMessage(error.message);
       } finally {
         setIsLoading(false);
@@ -280,11 +283,9 @@ function App() {
 const Main = styled.main`
   margin: 4rem auto auto auto;
   max-width: 600px;
-  justify-content: center;
   padding: 0 0.7rem;
+  z-index: 1;
   h1 {
-    display: flex;
-    gap: 0.2rem;
     span {
       img {
         border-radius: 15px;
@@ -292,6 +293,14 @@ const Main = styled.main`
         height: 25px;
       }
     }
+  }
+  button {
+    transition: 400ms all ease-in-out;
+  }
+  button:hover {
+    color: red;
+    transition: 400ms all ease-in-out;
+
   }
 `;
 export default App;

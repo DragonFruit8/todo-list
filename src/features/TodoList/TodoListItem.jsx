@@ -34,12 +34,14 @@ function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
         {isEditing ? (
           <>
             <TextInputWithLabel value={workingTitle} onChange={handleEdit} />
-            <button type="button" onClick={handleCancel}>
-              Cancel
-            </button>
-            <button type="submit" onClick={handleUpdate}>
-              Update
-            </button>
+            <div>
+              <button type="button" onClick={handleCancel}>
+                Cancel
+              </button>
+              <button type="submit" onClick={handleUpdate}>
+                Update
+              </button>
+            </div>
           </>
         ) : (
           <>
@@ -70,15 +72,31 @@ const Form = styled.form`
     text-decoration: line-through;
     opacity: 0.6;
   }
+  label {
+      flex-grow: 4;
+      input[type="text"] {
+        width:100%;
+      }
+    }
 `;
 
 const StyledList = styled.li`
+div {
+  display: flex;
+  flex-grow: 2;
+}
   button[type="submit"] {
+    
     background-color: green;
   }
   button[type="button"] {
+    
     background-color: red;
   }
 `;
 
+// const StyledDiv = styled.div`
+    
+//     flex: 1;
+// `;
 export default TodoListItem;

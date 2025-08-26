@@ -6,6 +6,10 @@
   margin: 0;
   padding: 0;
 }
+#root{ 
+  z-index: 0;
+}
+
 h1 {
     user-select: none;
 }
@@ -30,13 +34,13 @@ label {
 input[type="checkbox"],
 ul > li span, button {
   cursor: pointer;
-  padding: 0.125rem 1rem;
+  padding: 0.125rem 0.75rem;
   user-select: none;
 }
 input, select, option{
     flex: 3;
-    background-color: white;
-    color: green;
+    background-color: rgb(255, 255, 255);
+    color: black;
     padding: 0.25rem;
     font-size: 1rem;
     letter-spacing: .09rem;
@@ -45,16 +49,11 @@ input, select, option{
 }
 button {
     flex: 1 1 0;
+    min-width: 80px;
     cursor: pointer;
-    padding: 0.125rem 0.75rem;
     border: 1px solid white;
     border: 2px outset;
 }
-
-hr + div {
-  padding: 0.25rem 0;
-}
-
 input:focus, select:focus {
   outline: 1px orange solid;
   outline-offset: 0.2rem;
