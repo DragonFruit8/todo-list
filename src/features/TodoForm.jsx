@@ -1,8 +1,10 @@
 import { useRef, useState } from "react";
+import TextInputWithLabel from "../shared/TextInputWithLabel";
 
 function TodoForm({ onAddTodo, text }) {
   const todoTitleInput = useRef(document.querySelector("#todoTitle"));
   const [workingTodoTitle, setworkingTodoTitle] = useState("");
+
   const isDisabled = workingTodoTitle.trim() === "";
 
   function handleAddTodo(event) {
@@ -10,17 +12,17 @@ function TodoForm({ onAddTodo, text }) {
     // 1st Input Submit Defense
     if (workingTodoTitle === "") {
       alert("Please enter TODO Item");
+      return;
     } else {
       // 2nd Input Submit Defense (Takes spaces out IF entered character after " " ...)
       const newTodo = workingTodoTitle.trim();
       onAddTodo(newTodo);
     }
-    setworkingTodoTitle("");
+    setWorkingTodoTitle("");
     todoTitleInput.current.focus();
   }
   return (
     <>
-      <label htmlFor="todoTitle">Todo</label>
       <form onSubmit={handleAddTodo}>
         <input
           id="todoTitle"
@@ -30,6 +32,7 @@ function TodoForm({ onAddTodo, text }) {
           onChange={(event) => setworkingTodoTitle(event.target.value)}
         />
         {<button disabled={isDisabled}>{text}</button>}
+
       </form>
     </>
   );

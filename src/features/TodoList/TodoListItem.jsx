@@ -15,7 +15,6 @@ function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
     setWorkingTitle(title)
   }, [title])
 
-
   const handleEdit = (event) => {
     setWorkingTitle(event.target.value);
   };
