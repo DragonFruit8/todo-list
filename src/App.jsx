@@ -1,24 +1,26 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useReducer } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
 import "./App.module.css";
 import styled from "styled-components";
 import TodoLogo from "./assets/favicon.ico";
+import {
+  reducer as todosReducer,
+  actions as todoActions,
+  initialState as initTodoState,
+} from "./reducers/todos.reducer";
 
 function App() {
-  const [todoList, setTodoList] = useState([]);
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${
     import.meta.env.VITE_TABLE_NAME
   }`;
   const token = import.meta.env.VITE_PAT;
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
   const [sortField, setSortField] = useState("createdTime");
   const [sortDirection, setSortDirection] = useState("asc");
   const [queryString, setQueryString] = useState("");
-  const todoMemo = useMemo(() => todoList, [todoList]);
+  // const todoMemo = useMemo(() => todoList, [todoList]);
+  const [todoState, dispatch] = useReducer(todosReducer, initTodoState);
 
   const encodeUrl = useCallback(
     ({ sortDirection, sortField, queryString }) => {
@@ -42,7 +44,7 @@ function App() {
     };
     const fetchTodos = async () => {
       try {
-        setIsLoading(true);
+        dispatch({ type: todoActions.fetchTodos });
         const resp = await fetch(
           encodeUrl({ queryString, sortDirection, sortField }),
           options
@@ -51,35 +53,13 @@ function App() {
           throw new Error(resp.status);
         }
         const { records } = await resp.json();
-        setTodoList(
-          records.map((record) => {
-            const data = {
-              createdTime: record.createdTime,
-              id: record.id,
-              title: record.fields.title,
-              isComplete: record.fields?.isComplete,
-            };
-            if (data.status != "success") {
-              console.log("Status: " + resp.status);
-            }
-            if (data.isComplete === undefined) {
-              data.isComplete = false;
-            }
-            return data;
-          })
-        );
+        dispatch({ type: todoActions.loadTodos, records });
       } catch (error) {
-        if (error.status === 401) {
-          setErrorMessage("‼️" + "Authorization Required" + "‼️")
-        }
-        setErrorMessage(error.message);
-      } finally {
-        setIsLoading(false);
+        dispatch({ type: todoActions.setLoadError, error });
       }
     };
     fetchTodos();
   }, [encodeUrl, queryString, sortDirection, sortField, token]);
-
   const addTodo = async (newTodo) => {
     const payload = {
       records: [
@@ -100,7 +80,7 @@ function App() {
       body: JSON.stringify(payload),
     };
     try {
-      setIsSaving(true);
+      dispatch({ type: todoActions.startRequest });
       const resp = await fetch(
         encodeUrl({ queryString, sortDirection, sortField }),
         options
@@ -109,30 +89,17 @@ function App() {
         throw new Error("Data failed to be post");
       }
       const { records } = await resp.json();
-      const savedTodo = {
-        id: records[0].id,
-        title: payload.records[0].fields.title,
-      };
-      if (!records[0].fields.isComplete) {
-        savedTodo.isComplete = false;
-      }
-      console.log(
-        `"${savedTodo.title}" Saved in Database\n${
-          savedTodo.isComplete ? "And IS CHECKED" : ""
-        }`
-      );
-
-      setTodoList([...todoMemo, savedTodo]);
+      dispatch({ type: todoActions.addTodo, records });
     } catch (error) {
-      setErrorMessage(error.message);
+      dispatch({ type: todoActions.setLoadError, error });
     } finally {
-      setIsSaving(false);
+      dispatch({ type: todoActions.endRequest });
     }
   };
 
   const completeTodo = async (id, event) => {
-    const todoId = todoMemo.find((todo) => todo.id === id);
-    const todoIsComplete = todoMemo.map((todo) => {
+    const todoId = todoState.todoList.find((todo) => todo.id === id);
+    const todoIsComplete = todoState.todoList.map((todo) => {
       if (todo.id === id) {
         todoId.isComplete = event.target.checked;
       }
@@ -157,7 +124,7 @@ function App() {
       body: JSON.stringify(payload),
     };
     try {
-      setIsSaving(true);
+      dispatch({ type: todoActions.startRequest });
       const resp = await fetch(
         encodeUrl({ queryString, sortDirection, sortField }),
         options
@@ -166,22 +133,22 @@ function App() {
         throw new Error("Data failed to be post");
       }
       const { records } = await resp.json();
+      dispatch({ type: todoActions.completeTodo, records });
       if (records[0].fields.isComplete) {
         console.log(`${records[0].fields.title} is CHECKED in the Database`);
       } else if (!records[0].fields.isComplete) {
         console.log(`${records[0].fields.title} is UNCHECKED in the Database`);
       }
-      setTodoList([...todoIsComplete]);
     } catch (error) {
-      setErrorMessage(error.message);
-      setTodoList([...todoIsComplete]);
+      dispatch({ type: todoActions.setLoadError, error });
+      dispatch({ type: todoActions.updateTodo, todoIsComplete });
     } finally {
-      setIsSaving(false);
+      dispatch({ type: todoActions.endRequest });
     }
   };
 
   const updateTodo = async (id, editedTodo) => {
-    const originalTodo = todoMemo.find((todo) => todo.id === id);
+    const originalTodo = todoState.todoList.find((todo) => todo.id === id);
     if (originalTodo.title == editedTodo) {
       return;
     } else {
@@ -209,7 +176,7 @@ function App() {
     };
 
     try {
-      setIsSaving(true);
+      dispatch({ type: todoActions.startRequest });
       const resp = await fetch(
         encodeUrl({ queryString, sortDirection, sortField }),
         options
@@ -218,21 +185,16 @@ function App() {
         throw new Error("Data failed to be post");
       }
       const { records } = await resp.json();
-      if (records[0].fields.title) {
-        console.log(
-          `Item ID: ${records[0].id} \n Title Changed to: ${records[0].fields.title}`
-        );
-      }
+      dispatch({ type: todoActions.updateTodo, records });
     } catch (error) {
-      console.error(error.message);
       const revertedTodos = {
         id: originalTodo.id,
         title: originalTodo.title,
       };
-      setErrorMessage(`${error.message}. Reverting todo...`);
-      setTodoList([...revertedTodos]);
+      dispatch({ type: todoActions.revertTodo, revertedTodos });
+      dispatch({ type: todoActions.setLoadError, error });
     } finally {
-      setIsSaving(false);
+      dispatch({ type: todoActions.endRequest });
     }
   };
 
@@ -246,25 +208,28 @@ function App() {
       </h1>
       <TodoForm
         onAddTodo={addTodo}
-        text={isSaving ? "Saving..." : <span>Add Todo</span>}
+        text={todoState.isSaving ? "Saving..." : <span>Add Todo</span>}
       />
-      {todoMemo <= 0 ? (
+      {todoState.todoList <= 0 ? (
         <p>Add Todo Item...</p>
       ) : (
         <TodoList
-          todoList={todoMemo}
-          isLoading={isLoading}
+          todoList={todoState.todoList}
+          isLoading={todoState.isLoading}
           onUpdateTodo={updateTodo}
           onCompleteTodo={completeTodo}
         />
       )}
-      {errorMessage !== "" ? (
+      {todoState.errorMessage !== "" ? (
         <div>
           <hr />
-          <button className="close" onClick={() => setErrorMessage("")}>
+          <button
+            className="close"
+            onClick={() => dispatch({ type: todoActions.clearError })}
+          >
             X
           </button>
-          <p>{errorMessage}</p>
+          <p>{todoState.errorMessage}</p>
         </div>
       ) : (
         <hr />
@@ -300,7 +265,6 @@ const Main = styled.main`
   button:hover {
     color: red;
     transition: 400ms all ease-in-out;
-
   }
 `;
 export default App;
