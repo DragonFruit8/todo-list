@@ -12,9 +12,7 @@ import {
 } from "./reducers/todos.reducer";
 
 function App() {
-  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${
-    import.meta.env.VITE_TABLE_NAME
-  }`;
+  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
   const token = import.meta.env.VITE_PAT;
   const [sortField, setSortField] = useState("createdTime");
   const [sortDirection, setSortDirection] = useState("asc");
@@ -22,8 +20,7 @@ function App() {
   // const todoMemo = useMemo(() => todoList, [todoList]);
   const [todoState, dispatch] = useReducer(todosReducer, initTodoState);
 
-  const encodeUrl = useCallback(
-    ({ sortDirection, sortField, queryString }) => {
+  const encodeUrl = useCallback(({ sortDirection, sortField, queryString }) => {
       let searchQuery = "";
       let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
       if (queryString) {

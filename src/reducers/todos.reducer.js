@@ -16,38 +16,41 @@ const initialState = {
   isLoading: false,
   errorMessage: "",
   isSaving: false,
+  resp: 0,
+  savedTodo: {},
+  revertedTodos: {},
   sortField: "createdTime",
   sortDirection: "asc",
+  searchQuery: "",
   queryString: "",
-  resp: 0,
-  savedTodo: {}
+  sortQuery: "",
+  localQueryString: "",
 };
 
 function reducer(state = initialState, action) {
   switch (action.type) {
     case actions.fetchTodos:
-        return {
-            ...state,
-            isLoading: true,
+      return {
+        ...state,
+        isLoading: true,
       };
     case actions.loadTodos:
       return {
         ...state,
-        todoList: [...action.records.map((record) => {
+        todoList: [
+          ...action.records.map((record) => {
             const data = {
               createdTime: record.createdTime,
               id: record.id,
               title: record.fields.title,
               isComplete: record.fields?.isComplete,
             };
-            if (data.status != "success") {
-            //   console.log("Status: " + state.resp.status);
-            }
             if (data.isComplete === undefined) {
               data.isComplete = false;
             }
             return data;
-          })],
+          }),
+        ],
         isLoading: false,
       };
     case actions.setLoadError:
@@ -66,11 +69,11 @@ function reducer(state = initialState, action) {
         id: action.records[0].id,
         title: action.records[0].fields.title,
         isComplete: action.records[0]?.isComplete || false,
-      }
+      };
       return {
         ...state,
         todoList: [...state.todoList, state.savedTodo],
-        isSaving: false
+        isSaving: false,
       };
     case actions.endRequest:
       return {
@@ -81,25 +84,51 @@ function reducer(state = initialState, action) {
     case actions.updateTodo:
       return {
         ...state,
-        todoList: [...state.todoList]
+        todoList: [...state.todoList],
       };
     case actions.completeTodo:
       return {
         ...state,
         // Duplicate Code... Same as actions.updateTodo
-        todoList: [...state.todoList]
+        todoList: [...state.todoList],
       };
     case actions.revertTodo:
       return {
         ...state,
-        todoList: [...state.todoList, action.revertedTodos]
+        todoList: [...state.todoList, action.revertedTodos],
       };
     case actions.clearError:
       return {
         ...state,
-        errorMessage: '',
+        errorMessage: "",
       };
-      default: 
+    case actions.setSortQuery:
+      state.searchQuery = "";
+      state.sortQuery = `sort[0][field]=${state.sortField}&sort[0][direction]=${state.sortDirection}`;
+      if (state.queryString) {
+        state.searchQuery = `&filterByFormula=SEARCH("${state.queryString}",+title)`;
+      }
+      return {
+        ...state,
+        ...state.sortField,
+        ...state.searchQuery,
+        ...state.sortQuery,
+      };
+    case actions.setLocalQuery:
+      // state.localQueryString = action.payload.target.value
+      return {
+        ...state,
+        localQueryString: action.payload
+      };
+    case actions.setSortField:
+      return {
+        ...state,
+      };
+    case actions.setSortDirection:
+      return {
+        ...state,
+      };
+    default:
       return state;
   }
 }
