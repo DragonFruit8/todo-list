@@ -1,4 +1,6 @@
 import { useRef, useState } from "react";
+import TextInputWithLabel from "../shared/TextInputWithLabel";
+
 
 function TodoForm({ onAddTodo, text }) {
   const todoTitleInput = useRef(document.querySelector("#todoTitle"));
@@ -7,20 +9,19 @@ function TodoForm({ onAddTodo, text }) {
 
   function handleAddTodo(event) {
     event.preventDefault();
-    // 1st Input Submit Defense
     if (workingTodoTitle === "") {
       alert("Please enter TODO Item");
-    } else {
-      // 2nd Input Submit Defense (Takes spaces out IF entered character after " " ...)
+      return;
+    } else {   
       const newTodo = workingTodoTitle.trim();
       onAddTodo(newTodo);
+
     }
-    setworkingTodoTitle("");
+    setWorkingTodoTitle("");
     todoTitleInput.current.focus();
   }
   return (
     <>
-      <label htmlFor="todoTitle">Todo</label>
       <form onSubmit={handleAddTodo}>
         <input
           id="todoTitle"

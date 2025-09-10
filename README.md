@@ -14,5 +14,4 @@ Set-up application/project environment
    + Navigate to local directory (C:/path/to/folder/)
    - Type: `npm install`
    - Type: `npm run dev`
-   + npm run dev
    - open web browser and type in url => http://localhost:5173/
