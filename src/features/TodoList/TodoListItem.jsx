@@ -9,12 +9,10 @@ function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
     setWorkingTitle(title);
     setIsEditing(false)
   }
-
-
+  
   useEffect(() => {
     setWorkingTitle(title)
   }, [title])
-
 
   const handleEdit = (event) => {
     setWorkingTitle(event.target.value);
