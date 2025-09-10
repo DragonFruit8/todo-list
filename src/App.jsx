@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
@@ -12,40 +12,66 @@ import {
 } from "./reducers/todos.reducer";
 
 function App() {
-  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
-  const token = import.meta.env.VITE_PAT;
-  const [sortField, setSortField] = useState("createdTime");
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [queryString, setQueryString] = useState("");
-  // const todoMemo = useMemo(() => todoList, [todoList]);
   const [todoState, dispatch] = useReducer(todosReducer, initTodoState);
+  const token = import.meta.env.VITE_PAT;
+  const url = todoState.url;
+  const localQueryString = todoState.localQueryString;
+  const encoded = todoState.encoded;
 
-  const encodeUrl = useCallback(({ sortDirection, sortField, queryString }) => {
-      let searchQuery = "";
-      let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-      if (queryString) {
-        searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
-      }
-      return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-    },
-    [url]
-  );
+  // const refreshTodos = useCallback(async () => {
+  //   const options = {
+  //     method: "GET",
+  //     body: JSON.stringify(),
+  //     headers: {
+  //       Authorization: token,
+  //     },
+  //   };
+  //     dispatch({ type: todoActions.fetchTodos });
+  //     try {
+  //       let resp;
+
+  //       dispatch({
+  //         type: todoActions.setQuery,
+  //         payload: localQueryString,
+  //       });
+        
+  //       resp = await fetch(encoded, options);
+
+  //       if (!resp.ok) {
+  //         throw new Error(resp.status);
+  //       }
+  //       const { records } = await resp.json();
+  //       dispatch({ type: todoActions.loadTodos, records });
+  //     } catch (error) {
+  //       dispatch({ type: todoActions.setLoadError, error });
+  //     }
+  //   },[encoded, localQueryString, token]);
 
   useEffect(() => {
     const options = {
       method: "GET",
       body: JSON.stringify(),
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
       },
     };
+    
     const fetchTodos = async () => {
+      dispatch({ type: todoActions.fetchTodos });
       try {
-        dispatch({ type: todoActions.fetchTodos });
-        const resp = await fetch(
-          encodeUrl({ queryString, sortDirection, sortField }),
-          options
-        );
+        let resp, queryString;
+
+        dispatch({
+          type: todoActions.setQuery,
+          payload: localQueryString,
+        });
+        if (localQueryString !== "") {
+          queryString = encoded;
+        } else {
+          queryString = url;
+        }
+        resp = await fetch(queryString, options);
+
         if (!resp.ok) {
           throw new Error(resp.status);
         }
@@ -56,7 +82,10 @@ function App() {
       }
     };
     fetchTodos();
-  }, [encodeUrl, queryString, sortDirection, sortField, token]);
+  }, [url, localQueryString, encoded, token]);
+
+
+
   const addTodo = async (newTodo) => {
     const payload = {
       records: [
@@ -71,17 +100,14 @@ function App() {
     const options = {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
     };
     try {
       dispatch({ type: todoActions.startRequest });
-      const resp = await fetch(
-        encodeUrl({ queryString, sortDirection, sortField }),
-        options
-      );
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -115,27 +141,20 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
     };
     try {
       dispatch({ type: todoActions.startRequest });
-      const resp = await fetch(
-        encodeUrl({ queryString, sortDirection, sortField }),
-        options
-      );
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
       const { records } = await resp.json();
       dispatch({ type: todoActions.completeTodo, records });
-      if (records[0].fields.isComplete) {
-        console.log(`${records[0].fields.title} is CHECKED in the Database`);
-      } else if (!records[0].fields.isComplete) {
-        console.log(`${records[0].fields.title} is UNCHECKED in the Database`);
-      }
+      
     } catch (error) {
       dispatch({ type: todoActions.setLoadError, error });
       dispatch({ type: todoActions.updateTodo, todoIsComplete });
@@ -166,7 +185,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -174,10 +193,7 @@ function App() {
 
     try {
       dispatch({ type: todoActions.startRequest });
-      const resp = await fetch(
-        encodeUrl({ queryString, sortDirection, sortField }),
-        options
-      );
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -194,6 +210,52 @@ function App() {
       dispatch({ type: todoActions.endRequest });
     }
   };
+
+  const deleteTodo = async (id) => {
+    const deletedTodo = todoState.todoList.find((todo) => todo.id === id);
+    const todoID = deletedTodo.id;
+    const remappedTodoList = todoState.todoList.reduce((acc, item) => {
+      if (item.id !== todoID) {
+        acc.push(item);
+      }
+      return acc;
+    }, []);
+    dispatch({ type: todoActions.todoRefresh, payload: remappedTodoList });
+    const payload = {
+      records: {
+        id: todoID,
+      },
+    };
+    const options = {
+      method: "DELETE",
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    };
+    try {
+      dispatch({ type: todoActions.startRequest });
+      const resp = await fetch(`${url}/${deletedTodo.id}`, options);
+
+      if (!resp.ok) {
+        throw new Error("Todo NOT FOUND");
+      }
+      const { records } = await resp.json();
+      if (!records) {
+        dispatch({ type: todoActions.todoRefresh, payload: remappedTodoList });
+        alert(`"${deletedTodo.title}" DELETED`);
+      }
+    } catch (error) {
+      dispatch({ type: todoActions.setLoadError, error });
+    } finally {
+      dispatch({ type: todoActions.endRequest });
+    }
+  };
+
+  useEffect(() => {
+    todoState.todoList;
+  }, [todoState.todoList]);
 
   return (
     <Main>
@@ -215,6 +277,7 @@ function App() {
           isLoading={todoState.isLoading}
           onUpdateTodo={updateTodo}
           onCompleteTodo={completeTodo}
+          onDeleteTodo={deleteTodo}
         />
       )}
       {todoState.errorMessage !== "" ? (
@@ -231,14 +294,7 @@ function App() {
       ) : (
         <hr />
       )}
-      <TodosViewForm
-        sortDirection={sortDirection}
-        setSortDirection={setSortDirection}
-        sortField={sortField}
-        setSortField={setSortField}
-        queryString={queryString}
-        setQueryString={setQueryString}
-      />
+      <TodosViewForm />
     </Main>
   );
 }

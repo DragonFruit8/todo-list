@@ -9,34 +9,53 @@ const actions = {
   completeTodo: "completeTodo",
   revertTodo: "revertTodo",
   clearError: "clearError",
+  loadLocalQueryString: "loadLocalQueryString",
+  setQuery: "setQuery",
+  setSortDirection: "setSortDirection",
+  setSortField: "setSortField",
+  todoRefresh: "todoRefresh",
 };
 
 const initialState = {
+  url: `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`,
+  encoded: "",
   todoList: [],
   isLoading: false,
-  errorMessage: "",
   isSaving: false,
-  resp: 0,
+  errorMessage: "",
   savedTodo: {},
   revertedTodos: {},
   sortField: "createdTime",
   sortDirection: "asc",
   searchQuery: "",
-  queryString: "",
   sortQuery: "",
   localQueryString: "",
 };
 
 function reducer(state = initialState, action) {
   switch (action.type) {
+    case actions.updateString:
+      if(state.localQueryString) {
+        state.queryString = state.encoded
+      } else {
+        state.queryString
+      }
+      return {
+        ...state,
+        queryString: state.queryString,
+      }
     case actions.fetchTodos:
+      
       return {
         ...state,
         isLoading: true,
+        localQueryString: state.localQueryString,
+        url: state.url,
       };
     case actions.loadTodos:
       return {
         ...state,
+        localQueryString: state.localQueryString,
         todoList: [
           ...action.records.map((record) => {
             const data = {
@@ -72,6 +91,7 @@ function reducer(state = initialState, action) {
       };
       return {
         ...state,
+        savedTodo: state.savedTodo,
         todoList: [...state.todoList, state.savedTodo],
         isSaving: false,
       };
@@ -82,16 +102,28 @@ function reducer(state = initialState, action) {
         isSaving: false,
       };
     case actions.updateTodo:
+      
       return {
         ...state,
-        todoList: [...state.todoList],
+        ...state.todoList,
+        todoList: [...state.todoList, action.payload],
       };
     case actions.completeTodo:
+      if (action.records[0].fields.isComplete) {
+        console.log(`Database: \n"${action.records[0].fields.title}" is CHECKED`);
+      } else if (!action.records[0].fields.isComplete) {
+        console.log(`Database: \n"${action.records[0].fields.title}" is UNCHECKED`);
+      }
       return {
         ...state,
-        // Duplicate Code... Same as actions.updateTodo
         todoList: [...state.todoList],
       };
+    case actions.todoRefresh:
+      state.todoList = action.payload
+      return {
+        ...state,
+        todoList: [...state.todoList]
+      }  
     case actions.revertTodo:
       return {
         ...state,
@@ -102,31 +134,62 @@ function reducer(state = initialState, action) {
         ...state,
         errorMessage: "",
       };
-    case actions.setSortQuery:
+    case actions.setQuery:
+      state.localQueryString
       state.searchQuery = "";
       state.sortQuery = `sort[0][field]=${state.sortField}&sort[0][direction]=${state.sortDirection}`;
-      if (state.queryString) {
-        state.searchQuery = `&filterByFormula=SEARCH("${state.queryString}",+title)`;
+      if(state.localQueryString) {
+        state.searchQuery = `&filterByFormula=SEARCH("${state.localQueryString}",+title)`;
+        state.encoded = encodeURI(`${state.url}?${state.sortQuery}${state.searchQuery}`);
       }
       return {
         ...state,
-        ...state.sortField,
-        ...state.searchQuery,
-        ...state.sortQuery,
+        sortField: state.sortField,
+        sortDirection: state.sortDirection,
+        localQueryString: state.localQueryString,
+        encoded: state.encoded,
+        searchQuery: state.searchQuery,
       };
-    case actions.setLocalQuery:
-      // state.localQueryString = action.payload.target.value
+    case actions.loadLocalQueryString:
+      state.localQueryString = action.payload
       return {
         ...state,
-        localQueryString: action.payload
+        localQueryString: state.localQueryString,
       };
     case actions.setSortField:
+      state.sortField = action.payload
+      state.sortQuery = `sort[0][field]=${state.sortField}&sort[0][direction]=${state.sortDirection}`;
+      // state.encoded = encodeURI(`${state.url}?${state.sortQuery}${state.searchQuery}`);
       return {
         ...state,
+        sortField: state.sortField,
+        sortQuery: state.sortQuery,
+        encoded: state.encoded,
       };
     case actions.setSortDirection:
-      return {
+    state.sortDirection = action.payload
+    state.sortQuery = `sort[0][field]=${state.sortField}&sort[0][direction]=${state.sortDirection}`;
+    // state.encoded = encodeURI(`${state.url}?${state.sortQuery}${state.searchQuery}`);
+
+    // if(state.sortDirection === "asc") {
+    //   state.todoList = state.todoList.sort((a,b) => {
+    //        a = new Date(a.createdTime)
+    //        b = new Date(b.createdTime)
+    //        return a - b
+    //   });
+    // } else if (state.sortDirection === "desc") {
+    //   state.todoList = state.todoList.sort((a,b) => {
+    //        a = new Date(a.createdTime)
+    //        b = new Date(b.createdTime)
+    //        return a - b
+    //   })
+    // }
+    return {
         ...state,
+        todoList: state.todoList,
+        sortDirection: state.sortDirection,
+        sortQuery: state.sortQuery,
+        encoded: state.encoded,
       };
     default:
       return state;

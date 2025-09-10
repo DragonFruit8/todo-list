@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import TextInputWithLabel from "../../shared/TextInputWithLabel";
 import styled from "styled-components";
 
-function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
+function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, onDeleteTodo, checked }) {
   const [isEditing, setIsEditing] = useState(false);
   const [workingTitle, setWorkingTitle] = useState(title);
 
@@ -28,11 +28,19 @@ function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
     setIsEditing(false);
   };
 
+  const handleDelete = () => {
+    onDeleteTodo(id);
+    setIsEditing(false);
+  }
+
   return (
     <StyledList>
       <Form onSubmit={handleUpdate}>
         {isEditing ? (
           <>
+          <div>
+            <a onClick={handleDelete}> X </a>
+          </div>
             <TextInputWithLabel value={workingTitle} onChange={handleEdit} />
             <div>
               <button type="button" onClick={handleCancel}>
@@ -76,6 +84,29 @@ const Form = styled.form`
       flex-grow: 4;
       input[type="text"] {
         width:100%;
+      }
+    }
+    div{
+      button[type="button"]:hover {
+          color: black;
+      }
+    }
+    div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      a {
+        font-size: 20px;
+        scale: 1;
+        transform: rotateZ(0deg);
+        transition: all 800ms ease-in-out;
+      }
+      a:hover {
+        color: red;
+        cursor: pointer;
+        scale: 1.5;
+        transform: rotateZ(180deg);
+        transition: all 800ms ease-in-out;
       }
     }
 `;
