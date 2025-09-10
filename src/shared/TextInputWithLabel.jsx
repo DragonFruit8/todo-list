@@ -1,4 +1,3 @@
-
 function TextInputWithLabel({
     elementId,
     label,
