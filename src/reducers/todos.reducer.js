@@ -9,6 +9,8 @@ const actions = {
   completeTodo: "completeTodo",
   revertTodo: "revertTodo",
   clearError: "clearError",
+  setSearchQuery: "setSearchQuery",
+  setSortQuery: "setSortQuery"
 };
 
 const initialState = {
@@ -20,7 +22,9 @@ const initialState = {
   sortDirection: "asc",
   queryString: "",
   resp: 0,
-  savedTodo: {}
+  savedTodo: {},
+  searchQuery: "",
+  sortQuery: "",
 };
 
 function reducer(state = initialState, action) {
@@ -40,8 +44,8 @@ function reducer(state = initialState, action) {
               title: record.fields.title,
               isComplete: record.fields?.isComplete,
             };
-            if (data.status != "success") {
-            //   console.log("Status: " + state.resp.status);
+            if (!data) {
+              console.log("Whoops, something happened with the Todos being loaded");
             }
             if (data.isComplete === undefined) {
               data.isComplete = false;
@@ -86,7 +90,6 @@ function reducer(state = initialState, action) {
     case actions.completeTodo:
       return {
         ...state,
-        // Duplicate Code... Same as actions.updateTodo
         todoList: [...state.todoList]
       };
     case actions.revertTodo:
@@ -99,6 +102,22 @@ function reducer(state = initialState, action) {
         ...state,
         errorMessage: '',
       };
+    case actions.setSearchQuery:
+      if(action.payload == ""){
+        state.searchQuery = action.payload;
+      } else {
+        state.searchQuery = `&filterByFormula=SEARCH("${action.payload}",+title)`;
+      }
+      return {
+        ...state,
+        searchQuery: state.searchQuery,
+      }  
+    case actions.setSortQuery:
+      state.sortQuery = action.payload;
+      return {
+        ...state,
+        sortQuery: state.sortQuery,
+      }  
       default: 
       return state;
   }

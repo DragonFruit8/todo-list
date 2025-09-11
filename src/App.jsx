@@ -24,14 +24,19 @@ function App() {
 
   const encodeUrl = useCallback(
     ({ sortDirection, sortField, queryString }) => {
-      let searchQuery = "";
-      let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+      dispatch({
+        type: todoActions.setSortQuery,
+        payload: `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`,
+      });
+
       if (queryString) {
-        searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
+        dispatch({ type: todoActions.setSearchQuery, payload: queryString });
+      } else if (!queryString) {
+        dispatch({ type: todoActions.setSearchQuery, payload: "" });
       }
-      return encodeURI(`${url}?${sortQuery}${searchQuery}`);
+      return encodeURI(`${url}?${todoState.sortQuery}${todoState.searchQuery}`);
     },
-    [url]
+    [url, todoState.sortQuery, todoState.searchQuery]
   );
 
   useEffect(() => {
@@ -39,7 +44,7 @@ function App() {
       method: "GET",
       body: JSON.stringify(),
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
       },
     };
     const fetchTodos = async () => {
@@ -74,7 +79,7 @@ function App() {
     const options = {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -118,7 +123,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -169,7 +174,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
