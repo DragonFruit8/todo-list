@@ -19,7 +19,6 @@ function App() {
   const [sortField, setSortField] = useState("createdTime");
   const [sortDirection, setSortDirection] = useState("asc");
   const [queryString, setQueryString] = useState("");
-  // const todoMemo = useMemo(() => todoList, [todoList]);
   const [todoState, dispatch] = useReducer(todosReducer, initTodoState);
 
   const encodeUrl = useCallback(
@@ -42,7 +41,6 @@ function App() {
   useEffect(() => {
     const options = {
       method: "GET",
-      body: JSON.stringify(),
       headers: {
         Authorization: token,
       },
@@ -154,6 +152,7 @@ function App() {
 
   const updateTodo = async (id, editedTodo) => {
     const originalTodo = todoState.todoList.find((todo) => todo.id === id);
+    // Will have to come back to figure this logic out after useReducer utilized
     if (originalTodo.title == editedTodo) {
       return;
     } else {
@@ -215,7 +214,7 @@ function App() {
         onAddTodo={addTodo}
         text={todoState.isSaving ? "Saving..." : <span>Add Todo</span>}
       />
-      {todoState.todoList <= 0 ? (
+      {todoState.todoList === 0 ? (
         <p>Add Todo Item...</p>
       ) : (
         <TodoList
