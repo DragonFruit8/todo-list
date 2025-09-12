@@ -32,9 +32,8 @@ function App() {
   useEffect(() => {
     const options = {
       method: "GET",
-      body: JSON.stringify(),
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
       },
     };
     const fetchTodos = async () => {
@@ -57,9 +56,6 @@ function App() {
               title: record.fields.title,
               isComplete: record.fields?.isComplete,
             };
-            if (data.status != "success") {
-              console.log("Status: " + resp.status);
-            }
             if (data.isComplete === undefined) {
               data.isComplete = false;
             }
@@ -89,7 +85,7 @@ function App() {
     const options = {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -127,18 +123,13 @@ function App() {
 
   const completeTodo = async (id, event) => {
     const todoId = todoMemo.find((todo) => todo.id === id);
-    const todoIsComplete = todoMemo.map((todo) => {
-      if (todo.id === id) {
-        todoId.isComplete = event.target.checked;
-      }
-      return todo;
-    });
+   const todoIsComplete = todoList.map((todo) => todo.id === id ? { ...todo, isComplete: event.target.checked } : todo);
     const payload = {
       records: [
         {
           id: todoId.id,
           fields: {
-            isComplete: todoId.isComplete,
+            isComplete: event.target.checked,
           },
         },
       ],
@@ -146,7 +137,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -177,12 +168,7 @@ function App() {
 
   const updateTodo = async (id, editedTodo) => {
     const originalTodo = todoMemo.find((todo) => todo.id === id);
-    if (originalTodo.title == editedTodo) {
-      return;
-    } else {
-      originalTodo.isComplete = false;
-      originalTodo.title = editedTodo;
-    }
+    const updateTodo = { ...originalTodo, title: editedTodo, isComplete: false};
     const payload = {
       records: [
         {
@@ -197,7 +183,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -218,6 +204,7 @@ function App() {
           `Item ID: ${records[0].id} \n Title Changed to: ${records[0].fields.title}`
         );
       }
+      setTodoList(todoList.map(todo => todo.id === id ? updateTodo : todo))
     } catch (error) {
       console.error(error.message);
       const revertedTodos = {
@@ -238,7 +225,7 @@ function App() {
         onAddTodo={addTodo}
         text={isSaving ? "Saving..." : "Add Todo"}
       />
-      {todoMemo <= 0 ? (
+      {todoMemo === 0 ? (
         <p>Add Todo Item...</p>
       ) : (
         <TodoList
