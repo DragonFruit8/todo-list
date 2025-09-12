@@ -1,10 +1,9 @@
-
 function TextInputWithLabel({
     elementId,
     label,
-    onChange,
     ref,
     value,
+    onChange,
 }) {
   return (
     <>

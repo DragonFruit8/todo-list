@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
 
-
 function App() {
   const [todoList, setTodoList] = useState([]);
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${
