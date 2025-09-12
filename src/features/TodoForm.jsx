@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 
 function TodoForm({ onAddTodo, text }) {
-  const todoTitleInput = useRef(document.querySelector("#todoTitle"));
-  const [workingTodoTitle, setworkingTodoTitle] = useState("");
+  const todoTitleInput = useRef(null);
+  const [workingTodoTitle, setWorkingTodoTitle] = useState("");
   const isDisabled = workingTodoTitle.trim() === "";
 
   function handleAddTodo(event) {
@@ -15,7 +15,7 @@ function TodoForm({ onAddTodo, text }) {
       const newTodo = workingTodoTitle.trim();
       onAddTodo(newTodo);
     }
-    setworkingTodoTitle("");
+    setWorkingTodoTitle("");
     todoTitleInput.current.focus();
   }
   return (
@@ -27,7 +27,7 @@ function TodoForm({ onAddTodo, text }) {
           name="title"
           ref={todoTitleInput}
           value={workingTodoTitle}
-          onChange={(event) => setworkingTodoTitle(event.target.value)}
+          onChange={(event) => setWorkingTodoTitle(event.target.value)}
         />
         {<button disabled={isDisabled}>{text}</button>}
       </form>
