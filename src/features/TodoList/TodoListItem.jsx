@@ -4,17 +4,15 @@ import TextInputWithLabel from "../../shared/TextInputWithLabel";
 function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
   const [isEditing, setIsEditing] = useState(false);
   const [workingTitle, setWorkingTitle] = useState(title);
-  
+ 
   const handleCancel = () => {
     setWorkingTitle(title);
     setIsEditing(false)
   }
 
-
   useEffect(() => {
     setWorkingTitle(title)
   }, [title])
-
 
   const handleEdit = (event) => {
     setWorkingTitle(event.target.value);
