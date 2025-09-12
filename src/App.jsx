@@ -52,9 +52,7 @@ function App() {
               title: record.fields.title,
               isComplete: record.fields?.isComplete,
             };
-            if (data.status != "success") {
-              console.log("Status: " + resp.status);
-            }
+          
             if (data.isComplete === undefined) {
               data.isComplete = false;
             }
