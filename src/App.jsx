@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useState, useEffect, useCallback } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
@@ -13,17 +14,21 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [sortField, setSortField] = useState("createdTime");
-  const [sortDirection, setSortDirection] = useState("desc");
+  const [sortDirection, setSortDirection] = useState("asc");
   const [queryString, setQueryString] = useState("");
+  const todoMemo = useMemo(() => todoList, [todoList])
 
-  const encodeUrl = useCallback(({ sortDirection, sortField, queryString }) => {
-    let searchQuery = "";
-    let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-    if (queryString) {
-      searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
-    }
-    return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-  },[url]);
+  const encodeUrl = useCallback(
+    ({ sortDirection, sortField, queryString }) => {
+      let searchQuery = "";
+      let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+      if (queryString) {
+        searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
+      }
+      return encodeURI(`${url}?${sortQuery}${searchQuery}`);
+    },
+    [url]
+  );
 
   useEffect(() => {
     const options = {
@@ -35,8 +40,8 @@ function App() {
     const fetchTodos = async () => {
       try {
         setIsLoading(true);
-        const resp = await fetch(
-          encodeUrl({ sortDirection, sortField, queryString }),
+        const resp = await fetch
+          encodeUrl({ queryString, sortDirection, sortField })
           options
         );
         if (!resp.ok) {
@@ -52,7 +57,6 @@ function App() {
               title: record.fields.title,
               isComplete: record.fields?.isComplete,
             };
-          
             if (data.isComplete === undefined) {
               data.isComplete = false;
             }
@@ -89,8 +93,8 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(
-        encodeUrl({ sortDirection, sortField, queryString }),
+      const resp = await fetch
+        encodeUrl({ queryString, sortDirection, sortField })
         options
       );
       if (!resp.ok) {
@@ -109,8 +113,7 @@ function App() {
           savedTodo.isComplete ? "And IS CHECKED" : ""
         }`
       );
-
-      setTodoList([...todoList, savedTodo]);
+      setTodoList([...todoMemo, savedTodo]);
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -119,10 +122,8 @@ function App() {
   };
 
   const completeTodo = async (id, event) => {
-    const todoId = todoList.find((todo) => todo.id === id);
-    const todoIsComplete = todoList.map((todo) =>
-      todo.id === id ? { ...todo, isComplete: event.target.checked } : todo
-    );
+   const todoId = todoMemo.find((todo) => todo.id === id);
+   const todoIsComplete = todoList.map((todo) => todo.id === id ? { ...todo, isComplete: event.target.checked } : todo);
     const payload = {
       records: [
         {
@@ -144,7 +145,7 @@ function App() {
     try {
       setIsSaving(true);
       const resp = await fetch(
-        encodeUrl({ sortDirection, sortField, queryString }),
+        encodeUrl({ queryString, sortDirection, sortField }),
         options
       );
       if (!resp.ok) {
@@ -166,7 +167,7 @@ function App() {
   };
 
   const updateTodo = async (id, editedTodo) => {
-    const originalTodo = todoList.find((todo) => todo.id === id);
+    const originalTodo = todoMemo.find((todo) => todo.id === id);
     const updateTodo = { ...originalTodo, title: editedTodo, isComplete: false};
     const payload = {
       records: [
@@ -191,7 +192,7 @@ function App() {
     try {
       setIsSaving(true);
       const resp = await fetch(
-        encodeUrl({ sortDirection, sortField, queryString }),
+        encodeUrl({ queryString, sortDirection, sortField }),
         options
       );
       if (!resp.ok) {
@@ -203,7 +204,7 @@ function App() {
           `Item ID: ${records[0].id} \n Title Changed to: ${records[0].fields.title}`
         );
       }
-      setTodoList(todoList.map(todo => todo.id === id ? updateTodo : todo));
+      setTodoList(todoList.map(todo => todo.id === id ? updateTodo : todo))
     } catch (error) {
       console.error(error.message);
       const revertedTodos = {
@@ -224,11 +225,11 @@ function App() {
         onAddTodo={addTodo}
         text={isSaving ? "Saving..." : "Add Todo"}
       />
-      {todoList === 0 ? (
+      {todoMemo === 0 ? (
         <p>Add Todo Item...</p>
       ) : (
         <TodoList
-          todoList={todoList}
+          todoList={todoMemo}
           isLoading={isLoading}
           onUpdateTodo={updateTodo}
           onCompleteTodo={completeTodo}
