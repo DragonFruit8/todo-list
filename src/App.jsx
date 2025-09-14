@@ -1,52 +1,266 @@
-import {useState} from 'react';
-import TodoList from './features/TodoList/TodoList';
-import TodoForm from './features/TodoForm';
-import './App.css';
+import { useState, useEffect, useCallback } from "react";
+import TodoList from "./features/TodoList/TodoList";
+import TodoForm from "./features/TodoForm";
+import TodosViewForm from "./features/TodosViewForm";
 
-function App () {
-  const [todoList, setTodoList] = useState ([]);
+function App() {
+  const [todoList, setTodoList] = useState([]);
+  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${
+    import.meta.env.VITE_TABLE_NAME
+  }`;
+  const token = import.meta.env.VITE_PAT;
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [sortField, setSortField] = useState("createdTime");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [queryString, setQueryString] = useState("");
 
-  function addTodo (title) {
-    const newTodo = {
-      id: Date.now (),
-      title,
-      isComplete: false,
+  const encodeUrl = useCallback(({ sortDirection, sortField, queryString }) => {
+    let searchQuery = "";
+    let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+    if (queryString) {
+      searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
+    }
+    return encodeURI(`${url}?${sortQuery}${searchQuery}`);
+  },[url]);
+
+  useEffect(() => {
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: token,
+      },
     };
-    setTodoList ([...todoList, newTodo]);
-  }
-
-  function completeTodo (id) {
-    const updatedTodos = todoList.map (todo => {
-      if (todo.id === id) {
-        return {...todo, isComplete: true};
+    const fetchTodos = async () => {
+      try {
+        setIsLoading(true);
+        const resp = await fetch(
+          encodeUrl({ sortDirection, sortField, queryString }),
+          options
+        );
+        if (!resp.ok) {
+          setErrorMessage("Error: " + resp.status);
+          throw new Error(resp.status);
+        }
+        const { records } = await resp.json();
+        setTodoList(
+          records.map((record) => {
+            const data = {
+              createdTime: record.createdTime,
+              id: record.id,
+              title: record.fields.title,
+              isComplete: record.fields?.isComplete,
+            };
+          
+            if (data.isComplete === undefined) {
+              data.isComplete = false;
+            }
+            return data;
+          })
+        );
+      } catch (error) {
+        setErrorMessage(error.message);
+      } finally {
+        setIsLoading(false);
       }
-      return todo;
-    });
-    setTodoList (updatedTodos);
-  }
+    };
+    fetchTodos();
+  }, [encodeUrl, queryString, sortDirection, sortField, token]);
 
-  function updateTodo (id, editedTodo) {
-    const updatedTodo = todoList.map (todo => {
-      if (todo.id === id) {
-        let title = editedTodo;
-        return {id: todo.id, title, isComplete: todo.isComplete};
+  const addTodo = async (newTodo) => {
+    const payload = {
+      records: [
+        {
+          fields: {
+            title: newTodo,
+            isComplete: false,
+          },
+        },
+      ],
+    };
+    const options = {
+      method: "POST",
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    };
+    try {
+      setIsSaving(true);
+      const resp = await fetch(
+        encodeUrl({ sortDirection, sortField, queryString }),
+        options
+      );
+      if (!resp.ok) {
+        throw new Error("Data failed to be post");
       }
-      return todo;
-    });
-    setTodoList ([...updatedTodo]);
-  }
+      const { records } = await resp.json();
+      const savedTodo = {
+        id: records[0].id,
+        title: payload.records[0].fields.title,
+      };
+      if (!records[0].fields.isComplete) {
+        savedTodo.isComplete = false;
+      }
+      console.log(
+        `"${savedTodo.title}" Saved in Database\n${
+          savedTodo.isComplete ? "And IS CHECKED" : ""
+        }`
+      );
+
+      setTodoList([...todoList, savedTodo]);
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const completeTodo = async (id, event) => {
+    const todoId = todoList.find((todo) => todo.id === id);
+    const todoIsComplete = todoList.map((todo) =>
+      todo.id === id ? { ...todo, isComplete: event.target.checked } : todo
+    );
+    const payload = {
+      records: [
+        {
+          id: todoId.id,
+          fields: {
+            isComplete: event.target.checked,
+          },
+        },
+      ],
+    };
+    const options = {
+      method: "PATCH",
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    };
+    try {
+      setIsSaving(true);
+      const resp = await fetch(
+        encodeUrl({ sortDirection, sortField, queryString }),
+        options
+      );
+      if (!resp.ok) {
+        throw new Error("Data failed to be post");
+      }
+      const { records } = await resp.json();
+      if (records[0].fields.isComplete) {
+        console.log(`${records[0].fields.title} is CHECKED in the Database`);
+      } else if (!records[0].fields.isComplete) {
+        console.log(`${records[0].fields.title} is UNCHECKED in the Database`);
+      }
+      setTodoList([...todoIsComplete]);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setTodoList([...todoIsComplete]);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const updateTodo = async (id, editedTodo) => {
+    const originalTodo = todoList.find((todo) => todo.id === id);
+    const updateTodo = { ...originalTodo, title: editedTodo, isComplete: false};
+    const payload = {
+      records: [
+        {
+          id: originalTodo.id,
+          fields: {
+            title: editedTodo,
+            isComplete: originalTodo.isComplete,
+          },
+        },
+      ],
+    };
+    const options = {
+      method: "PATCH",
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    };
+
+    try {
+      setIsSaving(true);
+      const resp = await fetch(
+        encodeUrl({ sortDirection, sortField, queryString }),
+        options
+      );
+      if (!resp.ok) {
+        throw new Error("Data failed to be post");
+      }
+      const { records } = await resp.json();
+      if (records[0].fields.title) {
+        console.log(
+          `Item ID: ${records[0].id} \n Title Changed to: ${records[0].fields.title}`
+        );
+      }
+      setTodoList(todoList.map(todo => todo.id === id ? updateTodo : todo));
+    } catch (error) {
+      console.error(error.message);
+      const revertedTodos = {
+        id: originalTodo.id,
+        title: originalTodo.title,
+      };
+      setErrorMessage(`${error.message}. Reverting todo...`);
+      setTodoList([...revertedTodos]);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <div>
+    <>
       <h1>My Todos</h1>
-      <TodoForm onAddTodo={addTodo} />
-      <TodoList
-        todoList={todoList}
-        onUpdateTodo={updateTodo}
-        onCompleteTodo={completeTodo}
+      <TodoForm
+        onAddTodo={addTodo}
+        text={isSaving ? "Saving..." : "Add Todo"}
       />
-    </div>
+      {todoList === 0 ? (
+        <p>Add Todo Item...</p>
+      ) : (
+        <TodoList
+          todoList={todoList}
+          isLoading={isLoading}
+          onUpdateTodo={updateTodo}
+          onCompleteTodo={completeTodo}
+        />
+      )}
+      {errorMessage !== "" ? (
+        <div>
+          <hr />
+          <button className="close" onClick={() => setErrorMessage("")}>
+            X
+          </button>
+          <p>{errorMessage}</p>
+        </div>
+      ) : (
+        <hr />
+      )}
+      <TodosViewForm
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
+        sortField={sortField}
+        setSortField={setSortField}
+        queryString={queryString}
+        setQueryString={setQueryString}
+      />
+    </>
   );
 }
 
 export default App;
+// sortDirection,
+// setSortDirection,
+// sortField,
+// setSortField,
+// queryString,
+// setQueryString
