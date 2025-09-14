@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
@@ -39,8 +40,8 @@ function App() {
     const fetchTodos = async () => {
       try {
         setIsLoading(true);
-        const resp = await fetch(
-          encodeUrl({ queryString, sortDirection, sortField }),
+        const resp = await fetch
+          encodeUrl({ queryString, sortDirection, sortField })
           options
         );
         if (!resp.ok) {
@@ -92,8 +93,8 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(
-        encodeUrl({ queryString, sortDirection, sortField }),
+      const resp = await fetch
+        encodeUrl({ queryString, sortDirection, sortField })
         options
       );
       if (!resp.ok) {
@@ -112,7 +113,6 @@ function App() {
           savedTodo.isComplete ? "And IS CHECKED" : ""
         }`
       );
-
       setTodoList([...todoMemo, savedTodo]);
     } catch (error) {
       setErrorMessage(error.message);
@@ -122,7 +122,7 @@ function App() {
   };
 
   const completeTodo = async (id, event) => {
-    const todoId = todoMemo.find((todo) => todo.id === id);
+   const todoId = todoMemo.find((todo) => todo.id === id);
    const todoIsComplete = todoList.map((todo) => todo.id === id ? { ...todo, isComplete: event.target.checked } : todo);
     const payload = {
       records: [
@@ -259,3 +259,9 @@ function App() {
 }
 
 export default App;
+// sortDirection,
+// setSortDirection,
+// sortField,
+// setSortField,
+// queryString,
+// setQueryString

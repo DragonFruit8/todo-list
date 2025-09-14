@@ -28,7 +28,6 @@ function TodoForm({ onAddTodo, text }) {
           onChange={(event) => setWorkingTodoTitle(event.target.value)}
         />
         {<button disabled={isDisabled}>{text}</button>}
-
       </form>
     </>
   );
