@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
-import TodosViewForm from "./features/TodosViewForm";
 
 function App() {
   const [todoList, setTodoList] = useState([]);
@@ -35,10 +34,7 @@ function App() {
     const fetchTodos = async () => {
       try {
         setIsLoading(true);
-        const resp = await fetch(
-          encodeUrl({ sortDirection, sortField, queryString }),
-          options
-        );
+        const resp = await fetch(url, options);
         if (!resp.ok) {
           setErrorMessage("Error: " + resp.status);
           throw new Error(resp.status);
@@ -47,12 +43,10 @@ function App() {
         setTodoList(
           records.map((record) => {
             const data = {
-              createdTime: record.createdTime,
               id: record.id,
               title: record.fields.title,
               isComplete: record.fields?.isComplete,
             };
-          
             if (data.isComplete === undefined) {
               data.isComplete = false;
             }
@@ -66,7 +60,7 @@ function App() {
       }
     };
     fetchTodos();
-  }, [encodeUrl, queryString, sortDirection, sortField, token]);
+  }, [url, token]);
 
   const addTodo = async (newTodo) => {
     const payload = {
@@ -89,10 +83,7 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(
-        encodeUrl({ sortDirection, sortField, queryString }),
-        options
-      );
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -106,7 +97,7 @@ function App() {
       }
       console.log(
         `"${savedTodo.title}" Saved in Database\n${
-          savedTodo.isComplete ? "And IS CHECKED" : ""
+          savedTodo.isComplete ?  "And IS CHECKED" : ""
         }`
       );
 
@@ -120,9 +111,7 @@ function App() {
 
   const completeTodo = async (id, event) => {
     const todoId = todoList.find((todo) => todo.id === id);
-    const todoIsComplete = todoList.map((todo) =>
-      todo.id === id ? { ...todo, isComplete: event.target.checked } : todo
-    );
+    const todoIsComplete = todoList.map((todo) => todo.id === id ? { ...todo, isComplete: event.target.checked } : todo);
     const payload = {
       records: [
         {
@@ -143,10 +132,7 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(
-        encodeUrl({ sortDirection, sortField, queryString }),
-        options
-      );
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -167,7 +153,7 @@ function App() {
 
   const updateTodo = async (id, editedTodo) => {
     const originalTodo = todoList.find((todo) => todo.id === id);
-    const updateTodo = { ...originalTodo, title: editedTodo, isComplete: false};
+    const updateTodo = {...originalTodo, title: editedTodo, isComplete: false};
     const payload = {
       records: [
         {
@@ -190,10 +176,7 @@ function App() {
 
     try {
       setIsSaving(true);
-      const resp = await fetch(
-        encodeUrl({ sortDirection, sortField, queryString }),
-        options
-      );
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -203,7 +186,7 @@ function App() {
           `Item ID: ${records[0].id} \n Title Changed to: ${records[0].fields.title}`
         );
       }
-      setTodoList(todoList.map(todo => todo.id === id ? updateTodo : todo));
+      setTodoList(todoList.map(todo => todo.id === id ? updateTodo : todo))
     } catch (error) {
       console.error(error.message);
       const revertedTodos = {
@@ -224,16 +207,13 @@ function App() {
         onAddTodo={addTodo}
         text={isSaving ? "Saving..." : "Add Todo"}
       />
-      {todoList === 0 ? (
-        <p>Add Todo Item...</p>
-      ) : (
+      {todoList === 0 ? <p>Add Todo Item...</p> :
         <TodoList
-          todoList={todoList}
-          isLoading={isLoading}
-          onUpdateTodo={updateTodo}
-          onCompleteTodo={completeTodo}
-        />
-      )}
+        todoList={todoList}
+        isLoading={isLoading}
+        onUpdateTodo={updateTodo}
+        onCompleteTodo={completeTodo}
+      />}
       {errorMessage !== "" ? (
         <div>
           <hr />
