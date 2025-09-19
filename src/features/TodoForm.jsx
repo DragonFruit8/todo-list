@@ -8,12 +8,10 @@ function TodoForm({ onAddTodo, text }) {
 
   function handleAddTodo(event) {
     event.preventDefault();
-    // 1st Input Submit Defense
     if (workingTodoTitle === "") {
       alert("Please enter TODO Item");
       return;
     } else {
-      // 2nd Input Submit Defense (Takes spaces out IF entered character after " " ...)
       const newTodo = workingTodoTitle.trim();
       onAddTodo(newTodo);
     }

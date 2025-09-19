@@ -9,7 +9,7 @@ function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
     setWorkingTitle(title);
     setIsEditing(false)
   }
-  
+
   useEffect(() => {
     setWorkingTitle(title)
   }, [title])
