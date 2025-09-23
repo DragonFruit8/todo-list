@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import TodoList from "./features/TodoList/TodoList";
+import TodosViewForm from "./features/TodosViewForm"
 import TodoForm from "./features/TodoForm";
 
 function App() {
@@ -12,17 +13,21 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [sortField, setSortField] = useState("createdTime");
-  const [sortDirection, setSortDirection] = useState("desc");
+  const [sortDirection, setSortDirection] = useState("asc");
   const [queryString, setQueryString] = useState("");
+  const todoMemo = useMemo(() => todoList, [todoList])
 
-  const encodeUrl = useCallback(({ sortDirection, sortField, queryString }) => {
-    let searchQuery = "";
-    let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-    if (queryString) {
-      searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
-    }
-    return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-  },[url]);
+  const encodeUrl = useCallback(
+    ({ sortDirection, sortField, queryString }) => {
+      let searchQuery = "";
+      let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+      if (queryString) {
+        searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
+      }
+      return encodeURI(`${url}?${sortQuery}${searchQuery}`);
+    },
+    [url]
+  );
 
   useEffect(() => {
     const options = {
@@ -34,7 +39,10 @@ function App() {
     const fetchTodos = async () => {
       try {
         setIsLoading(true);
-        const resp = await fetch(url, options);
+        const resp = await fetch(
+          encodeUrl({ queryString, sortDirection, sortField }),
+          options
+        );
         if (!resp.ok) {
           setErrorMessage("Error: " + resp.status);
           throw new Error(resp.status);
@@ -83,7 +91,10 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(url, options);
+      const resp = await fetch(
+        encodeUrl({ queryString, sortDirection, sortField }),
+        options
+      );
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -100,8 +111,7 @@ function App() {
           savedTodo.isComplete ?  "And IS CHECKED" : ""
         }`
       );
-
-      setTodoList([...todoList, savedTodo]);
+      setTodoList([...todoMemo, savedTodo]);
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -110,8 +120,8 @@ function App() {
   };
 
   const completeTodo = async (id, event) => {
-    const todoId = todoList.find((todo) => todo.id === id);
-    const todoIsComplete = todoList.map((todo) => todo.id === id ? { ...todo, isComplete: event.target.checked } : todo);
+   const todoId = todoMemo.find((todo) => todo.id === id);
+   const todoIsComplete = todoList.map((todo) => todo.id === id ? { ...todo, isComplete: event.target.checked } : todo);
     const payload = {
       records: [
         {
@@ -132,7 +142,10 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch(url, options);
+      const resp = await fetch(
+        encodeUrl({ queryString, sortDirection, sortField }),
+        options
+      );
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -152,8 +165,8 @@ function App() {
   };
 
   const updateTodo = async (id, editedTodo) => {
-    const originalTodo = todoList.find((todo) => todo.id === id);
-    const updateTodo = {...originalTodo, title: editedTodo, isComplete: false};
+    const originalTodo = todoMemo.find((todo) => todo.id === id);
+    const updateTodo = { ...originalTodo, title: editedTodo, isComplete: false};
     const payload = {
       records: [
         {
@@ -176,7 +189,10 @@ function App() {
 
     try {
       setIsSaving(true);
-      const resp = await fetch(url, options);
+      const resp = await fetch(
+        encodeUrl({ queryString, sortDirection, sortField }),
+        options
+      );
       if (!resp.ok) {
         throw new Error("Data failed to be post");
       }
@@ -207,13 +223,16 @@ function App() {
         onAddTodo={addTodo}
         text={isSaving ? "Saving..." : "Add Todo"}
       />
-      {todoList === 0 ? <p>Add Todo Item...</p> :
+      {todoMemo.length === 0 ? (
+        <p>Add Todo Item...</p>
+      ) : (
         <TodoList
-        todoList={todoList}
-        isLoading={isLoading}
-        onUpdateTodo={updateTodo}
-        onCompleteTodo={completeTodo}
-      />}
+          todoList={todoMemo}
+          isLoading={isLoading}
+          onUpdateTodo={updateTodo}
+          onCompleteTodo={completeTodo}
+        />
+      )}
       {errorMessage !== "" ? (
         <div>
           <hr />
