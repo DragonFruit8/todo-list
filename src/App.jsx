@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import TodoList from "./features/TodoList/TodoList";
+import TodosViewForm from "./features/TodosViewForm"
 import TodoForm from "./features/TodoForm";
 
 function App() {
@@ -38,8 +39,8 @@ function App() {
     const fetchTodos = async () => {
       try {
         setIsLoading(true);
-        const resp = await fetch
-          encodeUrl({ queryString, sortDirection, sortField })
+        const resp = await fetch(
+          encodeUrl({ queryString, sortDirection, sortField }),
           options
         );
         if (!resp.ok) {
@@ -90,8 +91,8 @@ function App() {
     };
     try {
       setIsSaving(true);
-      const resp = await fetch
-        encodeUrl({ queryString, sortDirection, sortField })
+      const resp = await fetch(
+        encodeUrl({ queryString, sortDirection, sortField }),
         options
       );
       if (!resp.ok) {
@@ -222,7 +223,7 @@ function App() {
         onAddTodo={addTodo}
         text={isSaving ? "Saving..." : "Add Todo"}
       />
-      {todoMemo === 0 ? (
+      {todoMemo.length === 0 ? (
         <p>Add Todo Item...</p>
       ) : (
         <TodoList
