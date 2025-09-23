@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
-import TodosViewForm from "./features/TodosViewForm";
 
 function App() {
   const [todoList, setTodoList] = useState([]);
@@ -51,7 +50,6 @@ function App() {
         setTodoList(
           records.map((record) => {
             const data = {
-              createdTime: record.createdTime,
               id: record.id,
               title: record.fields.title,
               isComplete: record.fields?.isComplete,
@@ -69,7 +67,7 @@ function App() {
       }
     };
     fetchTodos();
-  }, [encodeUrl, queryString, sortDirection, sortField, token]);
+  }, [url, token]);
 
   const addTodo = async (newTodo) => {
     const payload = {
@@ -109,7 +107,7 @@ function App() {
       }
       console.log(
         `"${savedTodo.title}" Saved in Database\n${
-          savedTodo.isComplete ? "And IS CHECKED" : ""
+          savedTodo.isComplete ?  "And IS CHECKED" : ""
         }`
       );
       setTodoList([...todoMemo, savedTodo]);
