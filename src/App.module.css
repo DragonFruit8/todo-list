@@ -1,0 +1,92 @@
+*,
+html,
+body {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  background-color: black;
+  color: white;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  z-index: 0;
+}
+main {
+  margin: 6rem auto 1rem auto;
+  max-width: 700px;
+  padding: 0 0.7rem;
+  height: 80vh;
+  z-index: 1;
+}
+main h1 span img {
+  display: inline-flex;
+  flex-direction: column;
+  border-radius: 15px;
+  width: 50px;
+  height: 50px;
+}
+main h1 {
+  display: inline-flex;
+  text-align: center;
+  text-justify: center;
+  gap: 1rem;
+}
+
+h1 {
+  user-select: none;
+}
+p {
+  padding: 0.5rem 0.25rem;
+}
+hr {
+  flex: 1;
+  margin: 0.75rem 0;
+  width: 100%;
+}
+form {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+label {
+  font-size: 1.2rem;
+  padding: 0.25rem;
+  user-select: none;
+}
+input[type="checkbox"],
+ul > li span,
+button {
+  cursor: pointer;
+  padding: 0.125rem 0.75rem;
+  user-select: none;
+}
+input,
+select,
+option {
+  flex: 3;
+  background-color: rgb(255, 255, 255);
+  color: black;
+  padding: 0.25rem;
+  font-size: 1rem;
+  letter-spacing: 0.09rem;
+  max-width: 95%;
+  cursor: pointer;
+}
+button {
+  flex: 1 1 0;
+  min-width: 80px;
+  cursor: pointer;
+  border: 1px solid white;
+  border: 2px outset;
+}
+input:focus,
+select:focus {
+  outline: 1px orange solid;
+  outline-offset: 0.2rem;
+  opacity: 1;
+  transform: all 250px ease-in-out;
+}

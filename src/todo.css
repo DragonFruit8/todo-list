@@ -1,8 +1,0 @@
-li {
-  cursor: pointer;
-  user-select: none;
-};
-li:hover {
-    color: brown;
-    transition: color 100ms ease-in;
-};

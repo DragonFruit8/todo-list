@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import TodoList from "./features/TodoList/TodoList";
-import TodosViewForm from "./features/TodosViewForm"
 import TodoForm from "./features/TodoForm";
+
+import TodosViewForm from "./features/TodosViewForm";
+import styled from 'styled-components'
+import "./App.module.css";
+import TodoLogo from "./assets/favicon.ico";
 
 function App() {
   const [todoList, setTodoList] = useState([]);
@@ -15,7 +19,7 @@ function App() {
   const [sortField, setSortField] = useState("createdTime");
   const [sortDirection, setSortDirection] = useState("asc");
   const [queryString, setQueryString] = useState("");
-  const todoMemo = useMemo(() => todoList, [todoList])
+  const todoMemo = useMemo(() => todoList, [todoList]);
 
   const encodeUrl = useCallback(
     ({ sortDirection, sortField, queryString }) => {
@@ -33,7 +37,7 @@ function App() {
     const options = {
       method: "GET",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
       },
     };
     const fetchTodos = async () => {
@@ -44,7 +48,6 @@ function App() {
           options
         );
         if (!resp.ok) {
-          setErrorMessage("Error: " + resp.status);
           throw new Error(resp.status);
         }
         const { records } = await resp.json();
@@ -62,6 +65,9 @@ function App() {
           })
         );
       } catch (error) {
+        if (error.status === 401) {
+          setErrorMessage("‼️" + "Authorization Required" + "‼️")
+        }
         setErrorMessage(error.message);
       } finally {
         setIsLoading(false);
@@ -84,7 +90,7 @@ function App() {
     const options = {
       method: "POST",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -120,8 +126,8 @@ function App() {
   };
 
   const completeTodo = async (id, event) => {
-   const todoId = todoMemo.find((todo) => todo.id === id);
-   const todoIsComplete = todoList.map((todo) => todo.id === id ? { ...todo, isComplete: event.target.checked } : todo);
+    const todoId = todoMemo.find((todo) => todo.id === id);
+    const todoIsComplete = todoList.map((todo) => todo.id === id ? { ...todo, isComplete: event.target.checked } : todo);
     const payload = {
       records: [
         {
@@ -135,7 +141,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -181,7 +187,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -202,7 +208,7 @@ function App() {
           `Item ID: ${records[0].id} \n Title Changed to: ${records[0].fields.title}`
         );
       }
-      setTodoList(todoList.map(todo => todo.id === id ? updateTodo : todo))
+      setTodoList(todoList.map(todo => todo.id === id ? updateTodo : todo));
     } catch (error) {
       console.error(error.message);
       const revertedTodos = {
@@ -217,13 +223,19 @@ function App() {
   };
 
   return (
-    <>
-      <h1>My Todos</h1>
+    <main>
+      <h1>
+        <span>
+          <img src={TodoLogo} alt="Terra'Novare logo" />
+        </span>
+        My Todos
+      </h1>
       <TodoForm
         onAddTodo={addTodo}
-        text={isSaving ? "Saving..." : "Add Todo"}
+        text={isSaving ? "Saving..." : <span>Add Todo</span>}
       />
       {todoMemo.length === 0 ? (
+
         <p>Add Todo Item...</p>
       ) : (
         <TodoList
@@ -234,13 +246,13 @@ function App() {
         />
       )}
       {errorMessage !== "" ? (
-        <div>
+        <StyledMessage>
           <hr />
-          <button className="close" onClick={() => setErrorMessage("")}>
+          <button onClick={() => setErrorMessage("")}>
             X
           </button>
-          <p>{errorMessage}</p>
-        </div>
+          <p >{errorMessage}</p>
+        </StyledMessage>
       ) : (
         <hr />
       )}
@@ -252,9 +264,25 @@ function App() {
         queryString={queryString}
         setQueryString={setQueryString}
       />
-    </>
+    </main>
   );
 }
+
+const StyledMessage = styled.div`
+  p {
+  border: 1px dashed red;
+  padding: 1rem;
+  margin: 0.5rem auto 
+  }
+  button {
+    transition: 400ms all ease-in-out;
+  }
+  button:hover {
+    background-color: red;
+    color: black;
+    transition: 400ms all ease-in-out;
+  }
+`
 
 export default App;
 // sortDirection,

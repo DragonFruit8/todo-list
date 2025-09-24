@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import styled from "styled-components";
 
 function TodoForm({ onAddTodo, text }) {
   const todoTitleInput = useRef(null);
@@ -19,7 +20,8 @@ function TodoForm({ onAddTodo, text }) {
   }
   return (
     <>
-      <form onSubmit={handleAddTodo}>
+      <StyledForm onSubmit={handleAddTodo}>
+        <label htmlFor="todoTitle">Todo</label>
         <input
           id="todoTitle"
           name="title"
@@ -28,8 +30,50 @@ function TodoForm({ onAddTodo, text }) {
           onChange={(event) => setWorkingTodoTitle(event.target.value)}
         />
         {<button disabled={isDisabled}>{text}</button>}
-      </form>
+      </StyledForm>
     </>
   );
 }
+
+const StyledForm = styled.form`
+  display: flex;
+  gap: 0.7rem;
+  margin: 1rem 0 0.3rem;
+
+  button,
+  button span {
+    transition: 500ms all ease-in-out;
+  }
+  button,
+  button span {
+    background-color: #024700ff;
+  }
+   button:focus{
+    outline: 2px green solid;
+    outline-offset: 4px;
+  }
+  button:disabled,
+  button:disabled span {
+    background-color: gray;
+    color: white;
+    cursor: wait;
+    font-style: italic;
+    transition: 500ms all ease-in-out;
+  }
+  button:disabled:hover,
+  button:disabled:hover span {
+    background-color: #710000ff;
+    color: yellow;
+    transition: 3s all ease-in-out;
+  }
+  button:hover:has(span) {
+    background-color: green;
+    transition: 500ms all ease-in-out;
+    span {
+      background-color: inherit;
+      transition: 500ms all ease-in-out;
+    }
+  }
+`;
+
 export default TodoForm;
