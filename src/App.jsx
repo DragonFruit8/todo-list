@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
+
 import TodosViewForm from "./features/TodosViewForm";
 import styled from 'styled-components'
 import "./App.module.css";
@@ -35,7 +36,6 @@ function App() {
   useEffect(() => {
     const options = {
       method: "GET",
-      body: JSON.stringify(),
       headers: {
         "Authorization": `Bearer ${token}`,
       },
@@ -54,7 +54,6 @@ function App() {
         setTodoList(
           records.map((record) => {
             const data = {
-              createdTime: record.createdTime,
               id: record.id,
               title: record.fields.title,
               isComplete: record.fields?.isComplete,
@@ -75,7 +74,7 @@ function App() {
       }
     };
     fetchTodos();
-  }, [encodeUrl, queryString, sortDirection, sortField, token]);
+  }, [url, token]);
 
   const addTodo = async (newTodo) => {
     const payload = {
@@ -115,10 +114,9 @@ function App() {
       }
       console.log(
         `"${savedTodo.title}" Saved in Database\n${
-          savedTodo.isComplete ? "And IS CHECKED" : ""
+          savedTodo.isComplete ?  "And IS CHECKED" : ""
         }`
       );
-
       setTodoList([...todoMemo, savedTodo]);
     } catch (error) {
       setErrorMessage(error.message);
@@ -236,7 +234,8 @@ function App() {
         onAddTodo={addTodo}
         text={isSaving ? "Saving..." : <span>Add Todo</span>}
       />
-      {todoMemo === 0 ? (
+      {todoMemo.length === 0 ? (
+
         <p>Add Todo Item...</p>
       ) : (
         <TodoList
@@ -286,3 +285,9 @@ const StyledMessage = styled.div`
 `
 
 export default App;
+// sortDirection,
+// setSortDirection,
+// sortField,
+// setSortField,
+// queryString,
+// setQueryString
