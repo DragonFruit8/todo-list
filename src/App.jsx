@@ -42,7 +42,7 @@ function App() {
     const options = {
       method: "GET",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
       },
     };
     const fetchTodos = async () => {
@@ -77,7 +77,7 @@ function App() {
     const options = {
       method: "POST",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -121,7 +121,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -173,7 +173,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
