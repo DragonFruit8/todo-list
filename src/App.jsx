@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
+import styled from 'styled-components'
 import "./App.module.css";
-import styled from "styled-components";
 import TodoLogo from "./assets/favicon.ico";
 
 function App() {
@@ -37,7 +37,7 @@ function App() {
       method: "GET",
       body: JSON.stringify(),
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
       },
     };
     const fetchTodos = async () => {
@@ -91,7 +91,7 @@ function App() {
     const options = {
       method: "POST",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -143,7 +143,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -189,7 +189,7 @@ function App() {
     const options = {
       method: "PATCH",
       headers: {
-        Authorization: token,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -225,7 +225,7 @@ function App() {
   };
 
   return (
-    <Main>
+    <main>
       <h1>
         <span>
           <img src={TodoLogo} alt="Terra'Novare logo" />
@@ -247,13 +247,13 @@ function App() {
         />
       )}
       {errorMessage !== "" ? (
-        <div>
+        <StyledMessage>
           <hr />
-          <button className="close" onClick={() => setErrorMessage("")}>
+          <button onClick={() => setErrorMessage("")}>
             X
           </button>
-          <p>{errorMessage}</p>
-        </div>
+          <p >{errorMessage}</p>
+        </StyledMessage>
       ) : (
         <hr />
       )}
@@ -265,30 +265,24 @@ function App() {
         queryString={queryString}
         setQueryString={setQueryString}
       />
-    </Main>
+    </main>
   );
 }
-const Main = styled.main`
-  margin: 4rem auto auto auto;
-  max-width: 600px;
-  padding: 0 0.7rem;
-  z-index: 1;
-  h1 {
-    span {
-      img {
-        border-radius: 15px;
-        width: 25px;
-        height: 25px;
-      }
-    }
+
+const StyledMessage = styled.div`
+  p {
+  border: 1px dashed red;
+  padding: 1rem;
+  margin: 0.5rem auto 
   }
   button {
     transition: 400ms all ease-in-out;
   }
   button:hover {
-    color: red;
+    background-color: red;
+    color: black;
     transition: 400ms all ease-in-out;
-
   }
-`;
+`
+
 export default App;
