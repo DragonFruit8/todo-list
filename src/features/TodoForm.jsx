@@ -28,7 +28,14 @@ function TodoForm({ onAddTodo, text }) {
           value={workingTodoTitle}
           onChange={(event) => setWorkingTodoTitle(event.target.value)}
         />
-        {<button disabled={isDisabled}>{text}</button>}
+        {
+          <button
+            className={isDisabled ? "regBtn" : "addTodoItem"}
+            disabled={isDisabled}
+          >
+            {text}
+          </button>
+        }
       </StyledForm>
     </>
   );
@@ -39,39 +46,23 @@ const StyledForm = styled.form`
   gap: 0.7rem;
   margin: 1rem 0 0.3rem;
 
-  button,
-  button span {
-    transition: 500ms all ease-in-out;
-  }
-  button,
-  button span {
-    background-color: #024700ff;
-  }
-   button:focus{
-    outline: 2px green solid;
-    outline-offset: 4px;
-  }
-  button:disabled,
-  button:disabled span {
-    background-color: gray;
-    color: white;
-    cursor: wait;
-    font-style: italic;
-    transition: 500ms all ease-in-out;
-  }
-  button:disabled:hover,
-  button:disabled:hover span {
-    background-color: #710000ff;
-    color: yellow;
-    transition: 3s all ease-in-out;
-  }
-  button:hover:has(span) {
+  button.addTodoItem {
     background-color: green;
-    transition: 500ms all ease-in-out;
-    span {
-      background-color: inherit;
-      transition: 500ms all ease-in-out;
-    }
+    transition: 2s all ease-in-out;
+  }
+  button.addTodoItem:focus {
+    outline: 2px yellow solid;
+    outline-offset: 4px;
+    transition: 100ms all ease-in;
+  }
+  .regBtn {
+    background-color: gray;
+    transition: 1s all ease-in-out;
+  }
+  .regBtn:hover {
+    cursor: wait;
+    background-color: red;
+    transition: 1s all ease-in-out;
   }
 `;
 

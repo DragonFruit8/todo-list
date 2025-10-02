@@ -1,6 +1,10 @@
 ul {
+    display: flex;
+    flex-direction: column;
+    min-height: 55vh;
     padding-left: 0;
     padding: 0.7rem 0;
+    flex: 1 0;
 }
 ul li {
     list-style: none;
