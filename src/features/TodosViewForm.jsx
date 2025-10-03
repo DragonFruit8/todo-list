@@ -21,35 +21,37 @@ export default function TodosViewForm({
   }
   return (
     <>
-      <StyledDiv>
-        <label>Search todos: </label>
-        <br />
-        <input
-          type="text"
-          value={localQueryString}
-          onChange={(e) => setLocalQueryString(e.target.value)}
-        />
-        <button type="button" onClick={() => { setLocalQueryString(""); setQueryString(""); }}>
-          Clear
-        </button>
-      </StyledDiv>
-      <StyledForm onSubmit={handleSubmit}>
-        <label>Sort by</label>
-        <select
-          value={sortField}
-          onChange={(event) => setSortField(event.target.value)}
-        >
-          <option value="title">Title</option>
-          <option value="createdTime">Time added</option>
-        </select>
-        <select
-          value={sortDirection}
-          onChange={(event) => setSortDirection(event.target.value)}
-        >
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
-        </select>
-      </StyledForm>
+      <SearchSortDiv>
+        <StyledDiv>
+          <label>Search todos: </label>
+          <br />
+          <input
+            type="text"
+            value={localQueryString}
+            onChange={(e) => setLocalQueryString(e.target.value)}
+          />
+          <button type="button" onClick={() => setLocalQueryString("")}>
+            Clear
+          </button>
+        </StyledDiv>
+        <StyledForm onSubmit={handleSubmit}>
+          <label>Sort by</label>
+          <select
+            value={sortField}
+            onChange={(event) => setSortField(event.target.value)}
+          >
+            <option value="title">Title</option>
+            <option value="createdTime">Time added</option>
+          </select>
+          <select
+            value={sortDirection}
+            onChange={(event) => setSortDirection(event.target.value)}
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </StyledForm>
+      </SearchSortDiv>
     </>
   );
 }
@@ -57,6 +59,12 @@ export default function TodosViewForm({
 const StyledForm = styled.form`
   display: flex;
   gap: 0.7rem;
+`;
+
+const SearchSortDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `;
 const StyledDiv = styled.div`
   display: flex;
@@ -67,15 +75,15 @@ const StyledDiv = styled.div`
     width: 100%;
     min-width: 150px;
   }
-  button{
+  button {
     background-color: #5b0900ff;
     transition: all 250ms ease-in-out;
   }
-  button:hover{
+  button:hover {
     background-color: #ff1900ff;
     transition: all 250ms ease-in-out;
   }
-  button:focus{
+  button:focus {
     outline: 2px red solid;
     outline-offset: 4px;
   }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import TextInputWithLabel from "../../shared/TextInputWithLabel";
 import styled from "styled-components";
-import '../TodoListItem.module.css'
+import "../TodoListItem.module.css";
 
 function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -74,25 +74,24 @@ const Form = styled.form`
     opacity: 0.6;
   }
   label {
-      flex-grow: 4;
-      input[type="text"] {
-        width:100%;
-      }
+    flex-grow: 4;
+    input[type="text"] {
+      width: 100%;
     }
+  }
 `;
 
 const StyledList = styled.li`
-div {
-  display: flex;
-  flex-grow: 2;
-}
+  div {
+    display: flex;
+    flex-grow: 2;
+  }
   button[type="submit"] {
-    
     background-color: green;
   }
   button[type="button"] {
-    
     background-color: red;
   }
 `;
+
 export default TodoListItem;
