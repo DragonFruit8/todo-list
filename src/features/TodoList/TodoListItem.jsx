@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import TextInputWithLabel from "../../shared/TextInputWithLabel";
 import styled from "styled-components";
+import '../TodoListItem.module.css'
 
 function TodoListItem({ id, title, onCompleteTodo, onUpdateTodo, checked }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -94,9 +95,4 @@ div {
     background-color: red;
   }
 `;
-
-// const StyledDiv = styled.div`
-    
-//     flex: 1;
-// `;
 export default TodoListItem;

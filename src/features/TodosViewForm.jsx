@@ -29,7 +29,7 @@ export default function TodosViewForm({
           value={localQueryString}
           onChange={(e) => setLocalQueryString(e.target.value)}
         />
-        <button type="button" onClick={() => setLocalQueryString("")}>
+        <button type="button" onClick={() => { setLocalQueryString(""); setQueryString(""); }}>
           Clear
         </button>
       </StyledDiv>

@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useReducer } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
+
 import TodosViewForm from "./features/TodosViewForm";
+import styled from 'styled-components'
 import "./App.module.css";
-import styled from "styled-components";
 import TodoLogo from "./assets/favicon.ico";
 import {
   reducer as todosReducer,
@@ -113,7 +114,7 @@ function App() {
         {
           id: todoId.id,
           fields: {
-            isComplete: todoId.isComplete,
+            isComplete: event.target.checked,
           },
         },
       ],
@@ -203,7 +204,7 @@ function App() {
   };
 
   return (
-    <Main>
+    <main>
       <h1>
         <span>
           <img src={TodoLogo} alt="Terra'Novare logo" />
@@ -246,29 +247,30 @@ function App() {
         queryString={queryString}
         setQueryString={setQueryString}
       />
-    </Main>
+    </main>
   );
 }
-const Main = styled.main`
-  margin: 4rem auto auto auto;
-  max-width: 600px;
-  padding: 0 0.7rem;
-  z-index: 1;
-  h1 {
-    span {
-      img {
-        border-radius: 15px;
-        width: 25px;
-        height: 25px;
-      }
-    }
+
+const StyledMessage = styled.div`
+  p {
+  border: 1px dashed red;
+  padding: 1rem;
+  margin: 0.5rem auto 
   }
   button {
     transition: 400ms all ease-in-out;
   }
   button:hover {
-    color: red;
+    background-color: red;
+    color: black;
     transition: 400ms all ease-in-out;
   }
-`;
+`
+
 export default App;
+// sortDirection,
+// setSortDirection,
+// sortField,
+// setSortField,
+// queryString,
+// setQueryString

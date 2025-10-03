@@ -10,6 +10,7 @@ function TodoForm({ onAddTodo, text }) {
     event.preventDefault();
     if (workingTodoTitle === "") {
       alert("Please enter TODO Item");
+      return;
     } else {
       const newTodo = workingTodoTitle.trim();
       onAddTodo(newTodo);
